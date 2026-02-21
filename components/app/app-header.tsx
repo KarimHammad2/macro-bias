@@ -12,7 +12,7 @@ import { deriveRegime } from "@/components/admin/admin-utils";
 function RegimeBadge({ regime }: { regime: string }) {
   const colors = {
     "RISK-ON": "bg-positive/20 text-positive border-positive/30",
-    NEUTRAL: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    NEUTRAL: "bg-slate-500/20 text-slate-300 border-slate-500/30",
     "RISK-OFF": "bg-negative/20 text-negative border-negative/30",
   };
 

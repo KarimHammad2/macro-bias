@@ -170,6 +170,8 @@ function ProductsTable({ products, type }: { products: Product[]; type: string }
               <td className="px-4 py-3 text-center">
                 <a
                   href={product.factsheetLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-sm text-blue-400 transition-colors hover:text-blue-300"
                 >
                   View

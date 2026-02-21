@@ -277,7 +277,7 @@ export default function ProductsPage() {
                             product.liquidity
                           )}
                         </td>
-                        <td className="hidden px-4 py-3 text-slate-200 xl:table-cell">
+                        <td className="hidden max-w-[140px] overflow-hidden px-4 py-3 text-slate-200 xl:table-cell">
                           {isEditing ? (
                             <input
                               value={editingProduct?.factsheetLink ?? ""}
@@ -290,8 +290,20 @@ export default function ProductsPage() {
                               }
                               className={compactInputClass}
                             />
+                          ) : product.factsheetLink ? (
+                            <a
+                              href={product.factsheetLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={product.factsheetLink}
+                              className="block max-w-full truncate text-sky-400 hover:text-sky-300 hover:underline"
+                            >
+                              {product.factsheetLink.startsWith("http")
+                                ? "View factsheet"
+                                : product.factsheetLink}
+                            </a>
                           ) : (
-                            product.factsheetLink
+                            "—"
                           )}
                         </td>
                         <td className="px-4 py-3 text-right whitespace-nowrap">
