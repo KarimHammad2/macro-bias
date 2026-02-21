@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { getEmail, getInitials, logout } from "@/lib/auth";
 import { macroData } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,10 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border bg-background/95 px-6 backdrop-blur-sm">
-      <div className="flex items-center gap-2 lg:hidden">
+      <Link
+        href="/"
+        className="flex items-center gap-2 transition-opacity hover:opacity-90 lg:hidden"
+      >
         <div className="relative h-[42px] w-[54px] shrink-0">
           <Image
             src="/logo.png"
@@ -50,7 +54,7 @@ export function AppHeader() {
         <span className="text-sm font-semibold tracking-wide text-foreground">
           MACRO BIAS
         </span>
-      </div>
+      </Link>
 
       <div className="hidden items-center gap-4 lg:flex">
         <span className="text-xs text-muted-foreground">Current Regime:</span>

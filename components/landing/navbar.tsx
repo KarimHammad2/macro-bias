@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useAccessModal } from "./access-modal";
 
 export function LandingNavbar() {
@@ -23,7 +24,10 @@ export function LandingNavbar() {
       }`}
     >
       <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-8">
-        <div className="flex items-center gap-2">
+        <Link
+          href="/"
+          className="flex items-center gap-2 transition-opacity hover:opacity-90"
+        >
           <div className="relative h-12 w-[60px] shrink-0">
             <Image
               src="/logo.png"
@@ -37,7 +41,7 @@ export function LandingNavbar() {
           <span className="text-lg font-semibold tracking-wide text-white">
             MACRO BIAS
           </span>
-        </div>
+        </Link>
 
         <div className="hidden items-center gap-10 md:flex">
           <a

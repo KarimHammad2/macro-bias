@@ -108,7 +108,10 @@ export function AppSidebar() {
 
   return (
     <aside className="hidden w-64 flex-shrink-0 border-r border-border bg-sidebar lg:block">
-      <div className="flex h-16 items-center gap-2 border-b border-border px-6">
+      <Link
+        href="/"
+        className="flex h-16 items-center gap-2 border-b border-border px-6 transition-opacity hover:opacity-90"
+      >
         <div className="relative h-[42px] w-[54px] shrink-0">
           <Image
             src="/logo.png"
@@ -125,7 +128,7 @@ export function AppSidebar() {
           </span>
           <span className="text-xs text-muted-foreground">Dashboard</span>
         </div>
-      </div>
+      </Link>
 
       <nav className="p-4">
         <ul className="space-y-1">
