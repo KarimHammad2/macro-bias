@@ -3,9 +3,11 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { getEmail, getInitials, logout } from "@/lib/auth";
 import { macroData } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
+import { deriveRegime } from "@/components/admin/admin-utils";
 
 function RegimeBadge({ regime }: { regime: string }) {
   const colors = {
@@ -29,6 +31,21 @@ export function AppHeader() {
   const router = useRouter();
   const email = getEmail() || "user@example.com";
   const initials = getInitials(email);
+  const [currentRegime, setCurrentRegime] = useState<string>(() =>
+    deriveRegime(macroData.macroBiasScore)
+  );
+
+  useEffect(() => {
+    const loadRegime = async () => {
+      const response = await fetch("/api/admin/metrics");
+      if (!response.ok) return;
+      const payload = await response.json().catch(() => null);
+      if (payload?.metrics?.macroBiasScore != null) {
+        setCurrentRegime(deriveRegime(payload.metrics.macroBiasScore));
+      }
+    };
+    loadRegime();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -58,7 +75,7 @@ export function AppHeader() {
 
       <div className="hidden items-center gap-4 lg:flex">
         <span className="text-xs text-muted-foreground">Current Regime:</span>
-        <RegimeBadge regime={macroData.currentRegime} />
+        <RegimeBadge regime={currentRegime} />
       </div>
 
       <div className="flex items-center gap-4">
