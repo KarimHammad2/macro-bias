@@ -6,21 +6,21 @@ import Image from "next/image";
 const philosophyItems = [
   {
     src: "/philosophy-split-1.png",
-    title: "Gaussian Distribution",
+    title: "Consistancy",
     description:
-      "Diverse & wide-ranging expertise with strong predictive capabilities.",
+      "The Macro Bias Strategy has a history of consistently growing every year.",
   },
   {
     src: "/philosophy-split-2.png",
-    title: "Eagle",
+    title: "Resilience",
     description:
-      "Carefully curated investment strategies create financial freedom.",
+      "The Phoenix is a symbol of resilience. Our Regime stays strong even in times of recession and market correction.",
   },
   {
     src: "/philosophy-split-3.png",
-    title: "Crown",
+    title: "Achievement",
     description:
-      "Gauss was named Prince of Mathematics, resembling excellence and reputation.",
+      "Historically, the crown stands for achievement and triumph. It stands for the achievement of constant outperformance in the past.",
   },
 ];
 
@@ -88,7 +88,7 @@ export function PhilosophySection() {
     <section ref={sectionRef} className="bg-[#030712] py-32">
       <div className="mx-auto max-w-7xl px-8">
         <h2 className="mb-16 text-center text-4xl font-bold text-white md:text-5xl">
-          The Philosophy <span className="font-serif italic text-[#60a5fa]">behind</span> Gauss
+          The Philosophy behind <span className="font-serif italic text-[#60a5fa]">Macro Bias</span>
         </h2>
 
         <div className="relative min-h-[280px]">

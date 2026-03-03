@@ -23,12 +23,12 @@ export function LandingNavbar() {
         scrolled ? "bg-[#030712]/90 backdrop-blur-md border-b border-slate-800" : "bg-transparent"
       }`}
     >
-      <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-8">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-8">
         <Link
           href="/"
           className="flex items-center gap-2 transition-opacity hover:opacity-90"
         >
-          <div className="relative h-12 w-[60px] shrink-0">
+          <div className="relative h-8 w-10 shrink-0 sm:h-10 sm:w-[52px] md:h-12 md:w-[60px]">
             <Image
               src="/logo.png"
               alt=""
@@ -38,12 +38,12 @@ export function LandingNavbar() {
               aria-hidden="true"
             />
           </div>
-          <span className="text-lg font-semibold tracking-wide text-white">
+          <span className="text-base font-semibold tracking-wide text-white sm:text-lg">
             MACRO BIAS
           </span>
         </Link>
 
-        <div className="hidden items-center gap-10 md:flex">
+        <div className="hidden items-center gap-6 md:flex md:gap-10">
           <a
             href="#methodology"
             className="text-sm font-medium text-slate-400 transition-colors hover:text-white"

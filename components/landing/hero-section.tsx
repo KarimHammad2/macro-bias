@@ -75,7 +75,7 @@ export function HeroSection() {
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#030712]">
       {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#030712] via-[#030712] to-[#0a1628]" />
+      <div className="absolute inset-0 bg-linear-to-b from-[#030712] via-[#030712] to-[#0a1628]" />
       
       {/* Dot pattern background */}
       <div className="absolute inset-0 top-20">
@@ -83,13 +83,13 @@ export function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-8 pb-16 pt-56">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-4 pb-20 pt-32 sm:px-6 sm:pt-40 lg:px-8 lg:pb-24 lg:pt-56">
         <div
           className={`max-w-3xl transition-all duration-1000 ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
           }`}
         >
-          <h1 className="mb-6 text-5xl font-bold leading-[1.1] tracking-tight text-white md:text-6xl lg:text-7xl">
+          <h1 className="mb-6 text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
             <span className="font-serif italic text-[#60a5fa]">Regime-Driven</span> Exposure
             <br />
             for Modern
@@ -98,7 +98,7 @@ export function HeroSection() {
           </h1>
 
           <div
-            className={`flex items-center gap-3 transition-all delay-300 duration-1000 ${
+            className={`mt-4 flex items-center gap-3 transition-all delay-300 duration-1000 ${
               isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
             }`}
           >

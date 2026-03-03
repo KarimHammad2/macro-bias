@@ -18,7 +18,7 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-72 shrink-0 border-r border-slate-800/60 bg-[#0a1322] lg:block">
+    <aside className="hidden w-64 shrink-0 border-r border-slate-800/60 bg-[#0a1322] md:w-72 lg:block">
       <div className="flex h-20 items-center border-b border-slate-800/60 px-6">
         <div className="flex flex-col">
           <span className="text-xs uppercase tracking-[0.4em] text-slate-500">

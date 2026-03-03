@@ -170,12 +170,12 @@ export function MethodologySection() {
   const section2 = useScrollAnimation();
 
   return (
-    <section id="methodology" className="bg-[#030712] pt-48 pb-32">
-      <div className="mx-auto max-w-7xl px-8">
+    <section id="methodology" className="bg-[#030712] pt-32 pb-24 sm:pt-40 sm:pb-32">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* First block - Framework Origin */}
         <div
           ref={section1.ref}
-          className="mb-40 grid items-center gap-12 md:grid-cols-2"
+          className="mb-24 grid items-center gap-10 md:mb-40 md:grid-cols-2"
         >
           <div
             className={`transition-all duration-1000 ${
@@ -228,7 +228,7 @@ export function MethodologySection() {
         {/* Second block - Regime Philosophy */}
         <div
           ref={section2.ref}
-          className="grid items-center gap-12 md:grid-cols-2"
+          className="grid items-center gap-10 md:grid-cols-2"
         >
           <div
             className={`order-2 md:order-1 transition-all duration-1000 delay-200 ${

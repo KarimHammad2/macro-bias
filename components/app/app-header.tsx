@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { getEmail, getInitials, logout } from "@/lib/auth";
 import { macroData } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { AppSidebar } from "@/components/app/app-sidebar";
 import { deriveRegime } from "@/components/admin/admin-utils";
 
 function RegimeBadge({ regime }: { regime: string }) {
@@ -34,6 +36,7 @@ export function AppHeader() {
   const [currentRegime, setCurrentRegime] = useState<string>(() =>
     deriveRegime(macroData.macroBiasScore)
   );
+  const [isNavOpen, setIsNavOpen] = useState(false);
 
   useEffect(() => {
     const loadRegime = async () => {
@@ -53,49 +56,82 @@ export function AppHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border bg-background/95 px-6 backdrop-blur-sm">
-      <Link
-        href="/"
-        className="flex items-center gap-2 transition-opacity hover:opacity-90 lg:hidden"
-      >
-        <div className="relative h-[42px] w-[54px] shrink-0">
-          <Image
-            src="/logo.png"
-            alt=""
-            width={54}
-            height={42}
-            className="object-contain"
-            aria-hidden="true"
-          />
-        </div>
-        <span className="text-sm font-semibold tracking-wide text-foreground">
-          MACRO BIAS
-        </span>
-      </Link>
-
-      <div className="hidden items-center gap-4 lg:flex">
-        <span className="text-xs text-muted-foreground">Current Regime:</span>
-        <RegimeBadge regime={currentRegime} />
-      </div>
-
-      <div className="flex items-center gap-4">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-14 items-center justify-between px-4 sm:h-16 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-xs font-medium text-foreground">
-            {initials}
+          <Sheet open={isNavOpen} onOpenChange={setIsNavOpen}>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-foreground shadow-sm lg:hidden"
+                aria-label="Open navigation"
+              >
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  fill="none"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0">
+              <AppSidebar />
+            </SheetContent>
+          </Sheet>
+
+          <Link
+            href="/"
+            className="flex items-center gap-2 transition-opacity hover:opacity-90 lg:hidden"
+          >
+            <div className="relative h-8 w-10 shrink-0">
+              <Image
+                src="/logo.png"
+                alt=""
+                width={40}
+                height={32}
+                className="object-contain"
+                aria-hidden="true"
+              />
+            </div>
+            <span className="text-sm font-semibold tracking-wide text-foreground">
+              MACRO BIAS
+            </span>
+          </Link>
+
+          <div className="hidden items-center gap-3 lg:flex">
+            <span className="text-xs text-muted-foreground">
+              Current Regime:
+            </span>
+            <RegimeBadge regime={currentRegime} />
           </div>
-          <span className="hidden text-sm text-muted-foreground md:block">
-            {email}
-          </span>
         </div>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleLogout}
-          className="text-muted-foreground hover:text-foreground"
-        >
-          Log out
-        </Button>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-xs font-medium text-foreground">
+              {initials}
+            </div>
+            <span className="hidden text-sm text-muted-foreground sm:block">
+              {email}
+            </span>
+          </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Log out
+          </Button>
+        </div>
       </div>
     </header>
   );

@@ -212,16 +212,16 @@ export function PillarsSection() {
   return (
     <>
       {/* Dark blue section with carousel */}
-      <section className="relative overflow-hidden bg-[#0a1628] py-32">
+      <section className="relative overflow-hidden bg-[#0a1628] py-24 sm:py-32">
         <DotMapBackground />
-        <div className="relative z-10 mx-auto max-w-7xl px-8">
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <PillarCarousel />
         </div>
       </section>
 
       {/* Dark section with pillars grid */}
-      <section id="pillars" className="bg-[#030712] py-32">
-        <div className="mx-auto max-w-7xl px-8">
+      <section id="pillars" className="bg-[#030712] py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div
             ref={ref}
             className={`mb-16 text-center transition-all duration-1000 ${
