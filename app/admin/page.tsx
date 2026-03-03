@@ -21,6 +21,11 @@ const cards = [
     href: "/admin/framework",
   },
   {
+    title: "Legal Page",
+    description: "Edit Legal & Disclosures sections and copy.",
+    href: "/admin/legal",
+  },
+  {
     title: "Performance",
     description: "Manage yearly performance rows shown in the app.",
     href: "/admin/performance",

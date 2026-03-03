@@ -123,6 +123,16 @@ create table if not exists public.framework_sections (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.legal_sections (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  title text not null,
+  body text not null,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 alter table public.access_requests enable row level security;
 alter table public.admins enable row level security;
 alter table public.homepage_metrics enable row level security;
@@ -132,6 +142,7 @@ alter table public.positions enable row level security;
 alter table public.products enable row level security;
 alter table public.performance_yearly enable row level security;
 alter table public.framework_sections enable row level security;
+alter table public.legal_sections enable row level security;
 
 drop policy if exists "allow_insert_access_requests" on public.access_requests;
 drop policy if exists "allow_select_own_access_request" on public.access_requests;
@@ -163,6 +174,10 @@ drop policy if exists "allow_admin_select_framework_sections" on public.framewor
 drop policy if exists "allow_admin_insert_framework_sections" on public.framework_sections;
 drop policy if exists "allow_admin_update_framework_sections" on public.framework_sections;
 drop policy if exists "allow_admin_delete_framework_sections" on public.framework_sections;
+drop policy if exists "allow_admin_select_legal_sections" on public.legal_sections;
+drop policy if exists "allow_admin_insert_legal_sections" on public.legal_sections;
+drop policy if exists "allow_admin_update_legal_sections" on public.legal_sections;
+drop policy if exists "allow_admin_delete_legal_sections" on public.legal_sections;
 
 create policy "allow_insert_access_requests" on public.access_requests
   for insert
@@ -479,6 +494,50 @@ create policy "allow_admin_delete_framework_sections" on public.framework_sectio
     )
   );
 
+create policy "allow_admin_select_legal_sections" on public.legal_sections
+  for select
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
+create policy "allow_admin_insert_legal_sections" on public.legal_sections
+  for insert
+  to authenticated
+  with check (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
+create policy "allow_admin_update_legal_sections" on public.legal_sections
+  for update
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
+create policy "allow_admin_delete_legal_sections" on public.legal_sections
+  for delete
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
 insert into public.admins (email)
 values ('karim.88279@gmail.com')
 on conflict (email) do nothing;
@@ -673,6 +732,45 @@ values
     'update-frequency',
     'Update Frequency',
     '- **Daily Score**: Updated at market close each trading day based on intraday data.\n- **Weekly Review**: Full model recalibration and regime assessment every weekend.\n- **Regime Change Alerts**: Immediate notification when regime classification changes.\n- **Monthly Reports**: Comprehensive performance and attribution analysis.',
+    5
+  )
+on conflict (slug) do nothing;
+
+insert into public.legal_sections (
+  slug,
+  title,
+  body,
+  sort_order
+)
+values
+  (
+    'research-only-disclaimer',
+    'Research-Only Disclaimer',
+    'Macro Bias is a research and educational platform. All content, data, analyses, regime classifications, and performance metrics presented on this platform are for informational and research purposes only. The platform is designed to illustrate systematic approaches to macro regime analysis and should not be construed as a complete investment program or strategy.',
+    1
+  ),
+  (
+    'no-investment-advice',
+    'No Investment Advice',
+    'Nothing on this platform constitutes investment advice, a recommendation to buy or sell any security, or an offer or solicitation to invest in any fund, product, or strategy.\n\nUsers should:\n\n- Consult with qualified financial advisors before making any investment decisions\n- Conduct their own due diligence on any investment or strategy\n- Consider their own financial situation, risk tolerance, and investment objectives\n- Understand that leveraged products carry significant risks including potential loss of principal',
+    2
+  ),
+  (
+    'backtest-limitations',
+    'Backtest Limitations',
+    '**Important:** All performance data shown on this platform is backtested and hypothetical. Backtested performance has inherent limitations:\n\n- It is prepared with the benefit of hindsight\n- It may not reflect the impact of material market factors\n- Actual trading would have resulted in different outcomes due to slippage, fees, and execution timing\n- Past performance is not indicative of future results',
+    3
+  ),
+  (
+    'data-sources',
+    'Data Sources',
+    'Data used in our analyses and displays comes from various third-party sources believed to be reliable. However, we make no representations or warranties as to the accuracy, completeness, or timeliness of such information.\n\nData providers include:\n\n- Major financial data vendors for market prices\n- Central bank publications for monetary data\n- Government statistical agencies for economic data',
+    4
+  ),
+  (
+    'conflicts-of-interest',
+    'Conflicts of Interest',
+    'Users should be aware that the operators of this platform, their affiliates, and related parties may:\n\n- Hold positions in securities mentioned or analyzed on the platform\n- Trade in the same direction as or against regime signals\n- Have financial interests in products or instruments discussed\n- Receive compensation from third parties related to content',
     5
   )
 on conflict (slug) do nothing;
