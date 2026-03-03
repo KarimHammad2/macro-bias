@@ -81,7 +81,10 @@ export function AppHeader() {
                 </svg>
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0">
+            <SheetContent
+              side="left"
+              className="p-0 w-[80vw] max-w-xs"
+            >
               <AppSidebar mobile onNavigate={() => setIsNavOpen(false)} />
             </SheetContent>
           </Sheet>

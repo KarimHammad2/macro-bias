@@ -83,7 +83,7 @@ const navItems = [
     ),
   },
   {
-    name: "Nagivation Guide",
+    name: "Navigation Guide",
     href: "/app/navigation-guide",
     icon: (
       <svg
@@ -134,56 +134,60 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "w-64 shrink-0 border-r border-border bg-sidebar",
-        mobile ? "block h-full" : "hidden lg:block"
+        "shrink-0 border-r border-border bg-sidebar",
+        mobile
+          ? "flex h-full w-[80vw] max-w-xs flex-col"
+          : "hidden w-64 flex-col lg:flex"
       )}
     >
-      <Link
-        href="/"
-        className="flex h-16 items-center gap-2 border-b border-border px-6 transition-opacity hover:opacity-90"
-      >
-        <div className="relative h-[42px] w-[54px] shrink-0">
-          <Image
-            src="/logo.png"
-            alt=""
-            width={54}
-            height={42}
-            className="object-contain"
-            aria-hidden="true"
-          />
-        </div>
-        <div className="flex flex-col min-w-0">
-          <span className="text-sm font-semibold tracking-wide text-sidebar-foreground">
-            MACRO BIAS
-          </span>
-          <span className="text-xs text-muted-foreground">Dashboard</span>
-        </div>
-      </Link>
+      <div className="flex h-full flex-col">
+        <Link
+          href="/"
+          className="flex h-16 items-center gap-2 border-b border-border px-4 sm:px-6 transition-opacity hover:opacity-90"
+        >
+          <div className="relative h-[42px] w-[54px] shrink-0">
+            <Image
+              src="/logo.png"
+              alt=""
+              width={54}
+              height={42}
+              className="object-contain"
+              aria-hidden="true"
+            />
+          </div>
+          <div className="flex min-w-0 flex-col">
+            <span className="truncate text-sm font-semibold tracking-wide text-sidebar-foreground">
+              MACRO BIAS
+            </span>
+            <span className="text-xs text-muted-foreground">Dashboard</span>
+          </div>
+        </Link>
 
-      <nav className="p-4">
-        <ul className="space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={onNavigate}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                    isActive
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                  )}
-                >
-                  {item.icon}
-                  {item.name}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+        <nav className="flex-1 overflow-y-auto p-4 pb-6 sm:p-5">
+          <ul className="space-y-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={onNavigate}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors",
+                      isActive
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                    )}
+                  >
+                    {item.icon}
+                    <span className="truncate">{item.name}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </div>
     </aside>
   );
 }

@@ -14,7 +14,7 @@ export const adminNavItems = [
   { name: "Framework Page", href: "/admin/framework" },
   { name: "Legal Page", href: "/admin/legal" },
   {
-    name: "Nagivation Guide",
+    name: "Navigation Guide",
     href: "/admin/navigation-guides",
   },
   { name: "Admins & Users", href: "/admin/admins-users" },
