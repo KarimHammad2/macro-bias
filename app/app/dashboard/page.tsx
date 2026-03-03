@@ -290,9 +290,9 @@ export default function DashboardPage() {
     : orderedRunProgression;
   const sortedProducts = [...products].sort((a, b) => {
     if (a.exposureType === b.exposureType) {
-      const liquidityDiff = liquidityRank(a.liquidity) - liquidityRank(b.liquidity);
-      if (liquidityDiff !== 0) return liquidityDiff;
-      return leverageRank(a.leverage) - leverageRank(b.leverage);
+      const leverageDiff = leverageRank(a.leverage) - leverageRank(b.leverage);
+      if (leverageDiff !== 0) return leverageDiff;
+      return liquidityRank(a.liquidity) - liquidityRank(b.liquidity);
     }
     return a.exposureType.localeCompare(b.exposureType);
   });
@@ -392,7 +392,7 @@ export default function DashboardPage() {
             Products by Exposure Type
           </h2>
           <p className="text-sm text-muted-foreground">
-            Products ordered by liquidity (high to very low), then leverage within each side
+            Leveraged products ordered from 2x to 6x within each side
           </p>
         </div>
 

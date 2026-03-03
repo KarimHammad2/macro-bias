@@ -85,9 +85,9 @@ export async function GET() {
       .map(mapProductRow)
       .sort((a, b) => {
         if (a.exposureType === b.exposureType) {
-          const liquidityDiff = liquidityRank(a.liquidity) - liquidityRank(b.liquidity);
-          if (liquidityDiff !== 0) return liquidityDiff;
-          return leverageRank(a.leverage) - leverageRank(b.leverage);
+          const leverageDiff = leverageRank(a.leverage) - leverageRank(b.leverage);
+          if (leverageDiff !== 0) return leverageDiff;
+          return liquidityRank(a.liquidity) - liquidityRank(b.liquidity);
         }
         return a.exposureType.localeCompare(b.exposureType);
       });
