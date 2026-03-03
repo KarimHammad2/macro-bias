@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Pencil, Trash2 } from "lucide-react";
 
 export default function ProductsPage() {
   const email = useAdminSession();
@@ -332,17 +333,21 @@ export default function ProductsPage() {
                               <button
                                 type="button"
                                 onClick={() => handleEditProduct(product)}
-                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-[11px] text-slate-200 hover:border-slate-600/80"
+                                className="inline-flex items-center justify-center rounded-lg border border-slate-700/60 p-1.5 text-slate-200 hover:border-slate-600/80"
+                                aria-label="Edit product"
                               >
-                                Edit
+                                <Pencil className="h-3.5 w-3.5" />
+                                <span className="sr-only">Edit</span>
                               </button>
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                   <button
                                     type="button"
-                                    className="rounded-lg border border-red-500/40 px-2 py-1 text-[11px] text-red-300 hover:border-red-400"
+                                    className="inline-flex items-center justify-center rounded-lg border border-red-500/40 p-1.5 text-red-300 hover:border-red-400"
+                                    aria-label="Delete product"
                                   >
-                                    Delete
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    <span className="sr-only">Delete</span>
                                   </button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent className="border-slate-800/60 bg-[#0a1628] text-slate-100">
