@@ -196,7 +196,7 @@ export default function PositionsPage() {
                   <th className="hidden w-[11%] px-2 py-2 font-medium xl:table-cell">
                     Run Progression
                   </th>
-                  <th className="w-[13%] pl-2 pr-8 py-2 font-medium text-right whitespace-nowrap">
+                  <th className="w-[11%] px-2 py-2 font-medium text-right">
                     Actions
                   </th>
                 </tr>
@@ -368,9 +368,9 @@ export default function PositionsPage() {
                             <span className="text-xs text-slate-500">No</span>
                           )}
                         </td>
-                        <td className="pl-2 pr-8 py-2 text-right whitespace-nowrap">
+                        <td className="px-2 py-2 text-right align-middle">
                           {isEditing ? (
-                            <div className="flex items-center justify-end gap-1 pr-1">
+                            <div className="flex flex-wrap items-center justify-end gap-1">
                               <button
                                 type="button"
                                 onClick={() => handleSavePosition(position.id)}
@@ -390,7 +390,7 @@ export default function PositionsPage() {
                               </button>
                             </div>
                           ) : (
-                            <div className="flex items-center justify-end gap-1 pr-1">
+                            <div className="flex flex-wrap items-center justify-end gap-1">
                               <button
                                 type="button"
                                 onClick={() => handleEditPosition(position)}

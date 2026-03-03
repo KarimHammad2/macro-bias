@@ -171,7 +171,7 @@ export default function ProductsPage() {
                   <th className="px-4 py-3 font-medium">Leverage</th>
                   <th className="hidden px-4 py-3 font-medium xl:table-cell">Liquidity</th>
                   <th className="hidden px-4 py-3 font-medium xl:table-cell">Factsheet</th>
-                  <th className="px-4 py-3 font-medium text-right whitespace-nowrap">
+              <th className="px-2 py-3 font-medium text-right">
                     Actions
                   </th>
                 </tr>
@@ -306,13 +306,13 @@ export default function ProductsPage() {
                             "—"
                           )}
                         </td>
-                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <td className="px-2 py-3 text-right align-middle">
                           {isEditing ? (
-                            <div className="flex items-center justify-end gap-2">
+                            <div className="flex flex-wrap items-center justify-end gap-1 sm:gap-2">
                               <button
                                 type="button"
                                 onClick={() => handleSaveProduct(product.id)}
-                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-xs text-slate-200 hover:border-slate-600/80"
+                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-[11px] text-slate-200 hover:border-slate-600/80"
                               >
                                 Save
                               </button>
@@ -322,17 +322,17 @@ export default function ProductsPage() {
                                   setEditingProductId(null);
                                   setEditingProduct(null);
                                 }}
-                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-xs text-slate-400 hover:text-slate-200"
+                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-[11px] text-slate-400 hover:text-slate-200"
                               >
                                 Cancel
                               </button>
                             </div>
                           ) : (
-                            <div className="flex items-center justify-end gap-2">
+                            <div className="flex flex-wrap items-center justify-end gap-1 sm:gap-2">
                               <button
                                 type="button"
                                 onClick={() => handleEditProduct(product)}
-                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-xs text-slate-200 hover:border-slate-600/80"
+                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-[11px] text-slate-200 hover:border-slate-600/80"
                               >
                                 Edit
                               </button>
@@ -340,7 +340,7 @@ export default function ProductsPage() {
                                 <AlertDialogTrigger asChild>
                                   <button
                                     type="button"
-                                    className="rounded-lg border border-red-500/40 px-2 py-1 text-xs text-red-300 hover:border-red-400"
+                                    className="rounded-lg border border-red-500/40 px-2 py-1 text-[11px] text-red-300 hover:border-red-400"
                                   >
                                     Delete
                                   </button>
