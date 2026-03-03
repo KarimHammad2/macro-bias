@@ -34,6 +34,7 @@ create table if not exists public.dashboard_metrics (
   daily_macro_score numeric not null,
   monthly_macro_score numeric not null,
   regime_explanation text not null,
+  navigation_guide_text text not null default '',
   updated_at timestamptz not null default now()
 );
 
@@ -363,13 +364,15 @@ insert into public.dashboard_metrics (
   key,
   daily_macro_score,
   monthly_macro_score,
-  regime_explanation
+  regime_explanation,
+  navigation_guide_text
 )
 values (
   'singleton',
   0.68,
   0.71,
-  'Current macro conditions favor equity exposure. Liquidity conditions are supportive, volatility is contained, and economic indicators suggest continued growth momentum. Consider maintaining or increasing leveraged long positions according to your risk parameters.'
+  'Current macro conditions favor equity exposure. Liquidity conditions are supportive, volatility is contained, and economic indicators suggest continued growth momentum. Consider maintaining or increasing leveraged long positions according to your risk parameters.',
+  'Use this section to explain how users should read the dashboard, navigate categories, and apply the data to positioning decisions.'
 )
 on conflict (key) do nothing;
 
@@ -426,12 +429,12 @@ values
   ('4d4e10df-3b7a-42f0-9a74-7bc7b68a8b79', 'Long', 'WisdomTree S&P 500 3x Daily Lev', 'IE00B7Y34M31', '3x', 'High', '#'),
   ('df4b6d88-6c55-4b3c-8a3f-7af3f44d1b1f', 'Long', 'Xtrackers S&P 500 4x Daily Lev', 'IE00BM67HT60', '4x', 'Medium', '#'),
   ('3c2d2c4e-9f2a-4b43-96a5-3f14b7bb0987', 'Long', 'Leverage Shares 5x Long S&P 500', 'IE00BK5BZY66', '5x', 'Low', '#'),
-  ('6a10ecb0-5d5f-4e8d-a3e1-cb9af5b9b7b9', 'Long', 'GraniteShares 6x Long S&P 500', 'IE00BFNXW833', '6x', 'Too low liquidity', '#'),
+  ('6a10ecb0-5d5f-4e8d-a3e1-cb9af5b9b7b9', 'Long', 'GraniteShares 6x Long S&P 500', 'IE00BFNXW833', '6x', 'Very low liquidity', '#'),
   ('f6d5a5ff-45c3-4d1a-8f4e-2d7b1b45e2c9', 'Short', 'Xtrackers S&P 500 2x Inverse Daily', 'LU0411078636', '2x', 'High', '#'),
   ('96a7f5f4-0b77-4d75-8fd0-8d2b91bc7d34', 'Short', 'WisdomTree S&P 500 3x Short Daily', 'IE00B8K7YY98', '3x', 'Medium', '#'),
   ('f0d13b8d-8f7d-4d7b-8b9b-8fdb8c1d2f21', 'Short', 'Leverage Shares -4x Short S&P 500', 'IE00BK5C3532', '4x', 'Low', '#'),
-  ('1a5af3f1-62b1-4c26-9e07-2d00b39b6a63', 'Short', 'GraniteShares -5x Short S&P 500', 'IE00BN7KG879', '5x', 'Too low liquidity', '#'),
-  ('0e9b0a8e-7a8b-4a8b-8cf2-8f2cdb7e502e', 'Short', 'GraniteShares -6x Short S&P 500', 'IE00BLR6QB00', '6x', 'Too low liquidity', '#')
+  ('1a5af3f1-62b1-4c26-9e07-2d00b39b6a63', 'Short', 'GraniteShares -5x Short S&P 500', 'IE00BN7KG879', '5x', 'Very low liquidity', '#'),
+  ('0e9b0a8e-7a8b-4a8b-8cf2-8f2cdb7e502e', 'Short', 'GraniteShares -6x Short S&P 500', 'IE00BLR6QB00', '6x', 'Very low liquidity', '#')
 on conflict (id) do nothing;
 
 insert into public.performance_yearly (

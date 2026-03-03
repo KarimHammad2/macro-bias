@@ -11,6 +11,17 @@ type ProductPayload = {
   factsheetLink: string;
 };
 
+function normalizeLiquidity(liquidity: string): string {
+  return liquidity.toLowerCase() === "too low liquidity"
+    ? "Very low liquidity"
+    : liquidity;
+}
+
+function leverageRank(leverage: string): number {
+  const value = Number.parseFloat(leverage.replace(/[^0-9.]/g, ""));
+  return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
+}
+
 function mapProductRow(row: {
   id: string;
   exposure_type: string;
@@ -26,7 +37,7 @@ function mapProductRow(row: {
     name: row.name,
     isin: row.isin,
     leverage: row.leverage,
-    liquidity: row.liquidity,
+    liquidity: normalizeLiquidity(row.liquidity),
     factsheetLink: row.factsheet_link,
   };
 }
@@ -62,9 +73,16 @@ export async function GET() {
       return NextResponse.json({ message: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({
-      products: (data ?? []).map(mapProductRow),
-    });
+    const sorted = (data ?? [])
+      .map(mapProductRow)
+      .sort((a, b) => {
+        if (a.exposureType === b.exposureType) {
+          return leverageRank(a.leverage) - leverageRank(b.leverage);
+        }
+        return a.exposureType.localeCompare(b.exposureType);
+      });
+
+    return NextResponse.json({ products: sorted });
   } catch (error) {
     return NextResponse.json(
       { message: error instanceof Error ? error.message : "Unexpected error." },
@@ -85,7 +103,9 @@ export async function POST(request: Request) {
       name: typeof body?.name === "string" ? body.name.trim() : "",
       isin: typeof body?.isin === "string" ? body.isin.trim() : "",
       leverage: typeof body?.leverage === "string" ? body.leverage.trim() : "",
-      liquidity: typeof body?.liquidity === "string" ? body.liquidity.trim() : "",
+      liquidity: normalizeLiquidity(
+        typeof body?.liquidity === "string" ? body.liquidity.trim() : ""
+      ),
       factsheetLink:
         typeof body?.factsheetLink === "string" ? body.factsheetLink.trim() : "",
     };
@@ -137,7 +157,9 @@ export async function PUT(request: Request) {
       name: typeof body?.name === "string" ? body.name.trim() : "",
       isin: typeof body?.isin === "string" ? body.isin.trim() : "",
       leverage: typeof body?.leverage === "string" ? body.leverage.trim() : "",
-      liquidity: typeof body?.liquidity === "string" ? body.liquidity.trim() : "",
+      liquidity: normalizeLiquidity(
+        typeof body?.liquidity === "string" ? body.liquidity.trim() : ""
+      ),
       factsheetLink:
         typeof body?.factsheetLink === "string" ? body.factsheetLink.trim() : "",
     };

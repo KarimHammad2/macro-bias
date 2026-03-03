@@ -106,21 +106,35 @@ function useScrollAnimation() {
 function PillarCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isAutoReady, setIsAutoReady] = useState(false);
   const { ref, isVisible } = useScrollAnimation();
 
   const next = () => setActiveIndex((i) => (i + 1) % pillars.length);
   const prev = () => setActiveIndex((i) => (i - 1 + pillars.length) % pillars.length);
 
-  // Auto-scroll every 2.5 seconds
   useEffect(() => {
-    if (isPaused) return;
-    
+    if (!isVisible) return;
+    setActiveIndex(0);
+    setIsAutoReady(false);
+
+    // Keep point 1 stable briefly before auto-rotation starts.
+    const timer = window.setTimeout(() => {
+      setIsAutoReady(true);
+    }, 3000);
+
+    return () => window.clearTimeout(timer);
+  }, [isVisible]);
+
+  // Auto-scroll every 2.5 seconds, only while visible
+  useEffect(() => {
+    if (!isVisible || isPaused || !isAutoReady) return;
+
     const interval = setInterval(() => {
       setActiveIndex((i) => (i + 1) % pillars.length);
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [isVisible, isPaused, isAutoReady]);
 
   return (
     <div

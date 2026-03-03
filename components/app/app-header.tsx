@@ -82,7 +82,7 @@ export function AppHeader() {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0">
-              <AppSidebar />
+              <AppSidebar mobile onNavigate={() => setIsNavOpen(false)} />
             </SheetContent>
           </Sheet>
 

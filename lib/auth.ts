@@ -5,6 +5,7 @@ export function validateEmail(email: string): boolean {
 
 const SESSION_KEY = "macro_bias_session";
 const DEFAULT_SESSION_DAYS = 7;
+const SESSION_EVENT = "macro-bias-session-change";
 
 type SessionData = {
   email: string;
@@ -27,11 +28,13 @@ export function setSession(email: string, days = DEFAULT_SESSION_DAYS): void {
   const expiresAt = Date.now() + days * 24 * 60 * 60 * 1000;
   const session: SessionData = { email, expiresAt };
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  window.dispatchEvent(new Event(SESSION_EVENT));
 }
 
 export function clearSession(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(SESSION_KEY);
+  window.dispatchEvent(new Event(SESSION_EVENT));
 }
 
 export function getSessionEmail(): string | null {
@@ -65,4 +68,8 @@ export function getInitials(email: string): string {
     return (parts[0][0] + parts[1][0]).toUpperCase();
   }
   return email.slice(0, 2).toUpperCase();
+}
+
+export function getSessionEventName(): string {
+  return SESSION_EVENT;
 }

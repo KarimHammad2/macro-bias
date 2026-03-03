@@ -66,17 +66,56 @@ function usePhilosophyScrollProgress(sectionRef: React.RefObject<HTMLElement | n
 export function PhilosophySection() {
   const sectionRef = useRef<HTMLElement>(null);
   const progress = usePhilosophyScrollProgress(sectionRef);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const mergeFactor = progress < 0.35 ? 0 : progress > 0.65 ? 1 : (progress - 0.35) / 0.3;
-  const threeOpacity = progress < 0.5 ? 1 : progress > 0.65 ? 0 : 1 - (progress - 0.5) / 0.15;
-  const combinedOpacity = progress < 0.45 ? 0 : progress > 0.65 ? 1 : (progress - 0.45) / 0.2;
-  const textOpacity = progress < 0.4 ? 1 : progress > 0.6 ? 0 : 1 - (progress - 0.4) / 0.2;
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 767px)");
+    const sync = () => setIsMobile(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
+  const mobileMergeStart = 0.42;
+  const mobileMergeEnd = 0.78;
+  const desktopMergeStart = 0.35;
+  const desktopMergeEnd = 0.65;
+
+  const mergeStart = isMobile ? mobileMergeStart : desktopMergeStart;
+  const mergeEnd = isMobile ? mobileMergeEnd : desktopMergeEnd;
+  const mergeFactor =
+    progress < mergeStart
+      ? 0
+      : progress > mergeEnd
+        ? 1
+        : (progress - mergeStart) / (mergeEnd - mergeStart);
+  const threeOpacity =
+    progress < (isMobile ? 0.56 : 0.5)
+      ? 1
+      : progress > (isMobile ? 0.76 : 0.65)
+        ? 0
+        : 1 - (progress - (isMobile ? 0.56 : 0.5)) / (isMobile ? 0.2 : 0.15);
+  const combinedOpacity =
+    progress < (isMobile ? 0.54 : 0.45)
+      ? 0
+      : progress > (isMobile ? 0.78 : 0.65)
+        ? 1
+        : (progress - (isMobile ? 0.54 : 0.45)) / (isMobile ? 0.24 : 0.2);
+  const textOpacity =
+    progress < (isMobile ? 0.48 : 0.4)
+      ? 1
+      : progress > (isMobile ? 0.68 : 0.6)
+        ? 0
+        : 1 - (progress - (isMobile ? 0.48 : 0.4)) / (isMobile ? 0.2 : 0.2);
 
   const getColumnStyle = (index: number) => {
-    const transition = "transform 0.15s ease-out, opacity 0.2s ease-out";
+    const transition = isMobile
+      ? "transform 0.3s ease-out, opacity 0.3s ease-out"
+      : "transform 0.15s ease-out, opacity 0.2s ease-out";
     let translateX = "0";
-    if (index === 0) translateX = `${mergeFactor * 33}%`;
-    if (index === 2) translateX = `${-mergeFactor * 33}%`;
+    const mergeDistance = isMobile ? 20 : 33;
+    if (index === 0) translateX = `${mergeFactor * mergeDistance}%`;
+    if (index === 2) translateX = `${-mergeFactor * mergeDistance}%`;
     return {
       transform: `translateX(${translateX})`,
       opacity: threeOpacity,
@@ -85,8 +124,8 @@ export function PhilosophySection() {
   };
 
   return (
-    <section ref={sectionRef} className="bg-[#030712] py-32">
-      <div className="mx-auto max-w-7xl px-8">
+    <section ref={sectionRef} className="bg-[#030712] py-20 sm:py-32">
+      <div className="mx-auto max-w-7xl px-4 sm:px-8">
         <h2 className="mb-16 text-center text-4xl font-bold text-white md:text-5xl">
           The Philosophy behind <span className="font-serif italic text-[#60a5fa]">Macro Bias</span>
         </h2>

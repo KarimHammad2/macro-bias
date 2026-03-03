@@ -9,6 +9,7 @@ type PositionPayload = {
   stopLoss: number;
   positionSize: number;
   unrealizedPnL: number;
+  createdAt?: string;
 };
 
 function mapPositionRow(row: {
@@ -19,6 +20,7 @@ function mapPositionRow(row: {
   stop_loss: number;
   position_size: number;
   unrealized_pnl: number;
+  created_at: string;
 }): PositionPayload & { id: string } {
   return {
     id: row.id,
@@ -28,6 +30,7 @@ function mapPositionRow(row: {
     stopLoss: row.stop_loss,
     positionSize: row.position_size,
     unrealizedPnL: row.unrealized_pnl,
+    createdAt: row.created_at,
   };
 }
 
@@ -62,7 +65,7 @@ export async function GET() {
     const { data, error } = await supabase
       .from("positions")
       .select(
-        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl"
+        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl, created_at"
       )
       .order("created_at", { ascending: false });
 
@@ -111,7 +114,7 @@ export async function POST(request: Request) {
         updated_at: new Date().toISOString(),
       })
       .select(
-        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl"
+        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl, created_at"
       )
       .maybeSingle();
 
@@ -165,7 +168,7 @@ export async function PUT(request: Request) {
       })
       .eq("id", id)
       .select(
-        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl"
+        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl, created_at"
       )
       .maybeSingle();
 

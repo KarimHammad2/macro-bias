@@ -8,18 +8,21 @@ type DashboardMetricsPayload = {
   dailyMacroScore: number;
   monthlyMacroScore: number;
   regimeExplanation: string;
+  navigationGuideText: string;
 };
 
 function mapMetricsRow(row: {
   daily_macro_score: number;
   monthly_macro_score: number;
   regime_explanation: string;
+  navigation_guide_text: string;
   updated_at: string | null;
 }): DashboardMetricsPayload & { updatedAt: string | null } {
   return {
     dailyMacroScore: row.daily_macro_score,
     monthlyMacroScore: row.monthly_macro_score,
     regimeExplanation: row.regime_explanation,
+    navigationGuideText: row.navigation_guide_text,
     updatedAt: row.updated_at,
   };
 }
@@ -37,7 +40,9 @@ export async function GET() {
     const supabase = createSupabaseServiceClient();
     const { data, error } = await supabase
       .from("dashboard_metrics")
-      .select("daily_macro_score, monthly_macro_score, regime_explanation, updated_at")
+      .select(
+        "daily_macro_score, monthly_macro_score, regime_explanation, navigation_guide_text, updated_at"
+      )
       .eq("key", METRICS_KEY)
       .maybeSingle();
 
@@ -84,6 +89,10 @@ export async function POST(request: Request) {
         typeof body?.regimeExplanation === "string"
           ? body.regimeExplanation.trim()
           : "",
+      navigationGuideText:
+        typeof body?.navigationGuideText === "string"
+          ? body.navigationGuideText.trim()
+          : "",
     };
 
     const { data, error } = await supabase
@@ -94,11 +103,14 @@ export async function POST(request: Request) {
           daily_macro_score: payload.dailyMacroScore,
           monthly_macro_score: payload.monthlyMacroScore,
           regime_explanation: payload.regimeExplanation,
+          navigation_guide_text: payload.navigationGuideText,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "key" }
       )
-      .select("daily_macro_score, monthly_macro_score, regime_explanation, updated_at")
+      .select(
+        "daily_macro_score, monthly_macro_score, regime_explanation, navigation_guide_text, updated_at"
+      )
       .maybeSingle();
 
     if (error) {

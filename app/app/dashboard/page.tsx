@@ -8,6 +8,7 @@ type DashboardMetrics = {
   dailyMacroScore: number;
   monthlyMacroScore: number;
   regimeExplanation: string;
+  navigationGuideText: string;
 };
 
 type Position = {
@@ -18,6 +19,7 @@ type Position = {
   stopLoss: number;
   positionSize: number;
   unrealizedPnL: number;
+  createdAt?: string;
 };
 
 type Product = {
@@ -30,11 +32,24 @@ type Product = {
   leverage: string;
 };
 
+function leverageRank(leverage: string): number {
+  const value = Number.parseFloat(leverage.replace(/[^0-9.]/g, ""));
+  return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
+}
+
+function normalizeLiquidityLabel(liquidity: string): string {
+  return liquidity.toLowerCase() === "too low liquidity"
+    ? "Very low liquidity"
+    : liquidity;
+}
+
 const defaultDashboardMetrics: DashboardMetrics = {
   dailyMacroScore: 0.68,
   monthlyMacroScore: 0.71,
   regimeExplanation:
     "Current macro conditions favor equity exposure. Liquidity conditions are supportive, volatility is contained, and economic indicators suggest continued growth momentum. Consider maintaining or increasing leveraged long positions according to your risk parameters.",
+  navigationGuideText:
+    "Use this section to explain how users should read the dashboard, navigate categories, and apply the data to positioning decisions.",
 };
 
 function PositionsTable({
@@ -161,10 +176,11 @@ function ProductsTable({ products, type }: { products: Product[]; type: string }
                     product.liquidity === "High" && "text-positive",
                     product.liquidity === "Medium" && "text-amber-400",
                     product.liquidity === "Low" && "text-orange-400",
-                    product.liquidity === "Too low liquidity" && "text-negative"
+                    normalizeLiquidityLabel(product.liquidity) ===
+                      "Very low liquidity" && "text-negative"
                   )}
                 >
-                  {product.liquidity}
+                  {normalizeLiquidityLabel(product.liquidity)}
                 </span>
               </td>
               <td className="px-4 py-3 text-center">
@@ -213,6 +229,7 @@ export default function DashboardPage() {
           dailyMacroScore: payload.metrics.dailyMacroScore,
           monthlyMacroScore: payload.metrics.monthlyMacroScore,
           regimeExplanation: payload.metrics.regimeExplanation,
+          navigationGuideText: payload.metrics.navigationGuideText ?? "",
         });
         setMetricsError(null);
       }
@@ -252,6 +269,14 @@ export default function DashboardPage() {
     if (score < -0.5) return "negative";
     return "default";
   };
+  const activePosition = positions[0] ?? null;
+  const priorRuns = positions.slice(1, 4);
+  const sortedProducts = [...products].sort((a, b) => {
+    if (a.exposureType === b.exposureType) {
+      return leverageRank(a.leverage) - leverageRank(b.leverage);
+    }
+    return a.exposureType.localeCompare(b.exposureType);
+  });
 
   return (
     <div
@@ -294,17 +319,57 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      <div className="rounded-xl border border-border bg-card p-6">
+        <h2 className="text-lg font-semibold text-foreground">
+          Dashboard Navigation Guide
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          How to use each section and interpret positioning data.
+        </p>
+        <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+          {metrics.navigationGuideText}
+        </p>
+      </div>
+
       {/* Current positioning table */}
       <div className="rounded-xl border border-border bg-card">
         <div className="border-b border-border p-6">
           <h2 className="text-lg font-semibold text-foreground">
-            Current Positioning
+            Current Active Position
           </h2>
           <p className="text-sm text-muted-foreground">
-            Latest positioning details maintained by the admin team.
+            One active position is shown at a time. Earlier runs stay visible below.
           </p>
         </div>
-        <PositionsTable positions={positions} />
+        <PositionsTable positions={activePosition ? [activePosition] : []} />
+        <div className="border-t border-border px-6 py-4">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Run progression
+          </h3>
+          <div className="mt-3 space-y-2">
+            {(activePosition ? [activePosition, ...priorRuns] : priorRuns).map(
+              (position) => (
+                <p key={position.id} className="text-sm text-foreground">
+                  <span className="font-medium">{position.exposureType}</span> opened at{" "}
+                  <span className="font-mono">${position.entryPrice.toFixed(2)}</span>, stop at{" "}
+                  <span className="font-mono">${position.stopLoss.toFixed(2)}</span>, profit:{" "}
+                  <span
+                    className={cn(
+                      "font-mono font-semibold",
+                      position.unrealizedPnL >= 0 ? "text-positive" : "text-negative"
+                    )}
+                  >
+                    {position.unrealizedPnL >= 0 ? "+" : ""}$
+                    {position.unrealizedPnL.toFixed(2)}
+                  </span>
+                </p>
+              )
+            )}
+            {!activePosition && !positionsError ? (
+              <p className="text-sm text-muted-foreground">No active position available.</p>
+            ) : null}
+          </div>
+        </div>
         {positionsError ? (
           <p className="px-6 pb-6 text-xs text-negative">{positionsError}</p>
         ) : null}
@@ -317,7 +382,7 @@ export default function DashboardPage() {
             Products by Exposure Type
           </h2>
           <p className="text-sm text-muted-foreground">
-            Available leveraged products for different exposure levels
+            Leveraged products ordered from 2x to 6x within each side
           </p>
         </div>
 
@@ -347,7 +412,7 @@ export default function DashboardPage() {
         </div>
 
         <ProductsTable
-          products={products.filter(
+          products={sortedProducts.filter(
             (product) => product.exposureType === activeProductTab
           )}
           type={activeProductTab}

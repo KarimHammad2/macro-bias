@@ -1,13 +1,49 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getSessionEventName, isSessionValid } from "@/lib/auth";
 import { useAccessModal } from "./access-modal";
 
 export function Footer() {
   const { openModal } = useAccessModal();
+  const [hasSession, setHasSession] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const syncSession = () => setHasSession(isSessionValid());
+    const sessionEvent = getSessionEventName();
+    syncSession();
+
+    window.addEventListener("focus", syncSession);
+    window.addEventListener("storage", syncSession);
+    window.addEventListener(sessionEvent, syncSession);
+    document.addEventListener("visibilitychange", syncSession);
+
+    return () => {
+      window.removeEventListener("focus", syncSession);
+      window.removeEventListener("storage", syncSession);
+      window.removeEventListener(sessionEvent, syncSession);
+      document.removeEventListener("visibilitychange", syncSession);
+    };
+  }, []);
+
+  const ctaLabel = hasSession ? "Login" : "Get Access";
+
+  const handleCtaClick = () => {
+    if (hasSession) {
+      router.push("/app/home");
+      return;
+    }
+    openModal();
+  };
 
   return (
-    <footer id="contact" className="relative overflow-hidden bg-[#0a1628] py-32">
+    <footer
+      id="contact"
+      className="relative w-full overflow-x-clip bg-[#0a1628] pt-10 pb-20 sm:pt-16 sm:pb-24 md:py-32 touch-pan-y"
+    >
       {/* Dot pattern background */}
       <div className="absolute inset-0 opacity-30">
         <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
@@ -27,10 +63,10 @@ export function Footer() {
         </svg>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-8">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-8">
         <div className="flex flex-col items-center text-center">
           {/* Logo */}
-          <div className="relative mb-4 h-12 w-[60px] shrink-0">
+          <div className="relative mb-3 h-12 w-[60px] shrink-0 sm:mb-4">
             <Image
               src="/logo.png"
               alt=""
@@ -41,7 +77,7 @@ export function Footer() {
             />
           </div>
 
-          <span className="mb-12 text-2xl font-semibold tracking-wider text-white">
+          <span className="mb-8 text-2xl font-semibold tracking-wider text-white sm:mb-12">
             MACRO BIAS
           </span>
 
@@ -57,13 +93,13 @@ export function Footer() {
             EST. 2025 | BACKTESTED METHODOLOGY
           </p>
 
-          {/* Get Access Button */}
+          {/* Get Access / Login Button */}
           <div className="w-full max-w-md">
             <button
-              onClick={openModal}
-              className="group flex mx-auto items-center justify-center gap-3 border-b-2 border-[#3b82f6] px-8 py-4 text-sm font-medium uppercase tracking-widest text-[#60a5fa] transition-all hover:bg-[#3b82f6] hover:text-white cursor-pointer"
+              onClick={handleCtaClick}
+            className="group flex mx-auto items-center justify-center gap-3 border-b-2 border-[#3b82f6] px-6 py-4 text-sm font-medium uppercase tracking-[0.18em] sm:tracking-widest text-[#60a5fa] transition-all hover:bg-[#3b82f6] hover:text-white cursor-pointer"
             >
-              Get Access
+              {ctaLabel}
               <svg
                 className="h-4 w-4 transition-transform group-hover:translate-x-1"
                 fill="none"

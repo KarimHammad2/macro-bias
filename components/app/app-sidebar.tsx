@@ -103,11 +103,22 @@ const navItems = [
   },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({
+  mobile = false,
+  onNavigate,
+}: {
+  mobile?: boolean;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 flex-shrink-0 border-r border-border bg-sidebar lg:block">
+    <aside
+      className={cn(
+        "w-64 shrink-0 border-r border-border bg-sidebar",
+        mobile ? "block h-full" : "hidden lg:block"
+      )}
+    >
       <Link
         href="/"
         className="flex h-16 items-center gap-2 border-b border-border px-6 transition-opacity hover:opacity-90"
@@ -138,6 +149,7 @@ export function AppSidebar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  onClick={onNavigate}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                     isActive

@@ -12,12 +12,20 @@ import {
 } from "recharts";
 import { equityCurveData } from "@/lib/mock-data";
 
-export function EquityCurveChart() {
+type EquityCurvePoint = {
+  year: number;
+  macroBias: number;
+  sp500: number;
+};
+
+export function EquityCurveChart({ data }: { data?: EquityCurvePoint[] }) {
+  const chartData = data && data.length > 0 ? data : equityCurveData;
+
   return (
     <div className="h-[350px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={equityCurveData}
+          data={chartData}
           margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" />

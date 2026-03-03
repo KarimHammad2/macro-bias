@@ -28,6 +28,7 @@ export type DashboardMetricsForm = {
   dailyMacroScore: string;
   monthlyMacroScore: string;
   regimeExplanation: string;
+  navigationGuideText: string;
 };
 
 export type Position = {
@@ -107,6 +108,8 @@ const defaultDashboardMetrics: DashboardMetricsForm = {
   monthlyMacroScore: "0.71",
   regimeExplanation:
     "Current macro conditions favor equity exposure. Liquidity conditions are supportive, volatility is contained, and economic indicators suggest continued growth momentum. Consider maintaining or increasing leveraged long positions according to your risk parameters.",
+  navigationGuideText:
+    "Use this section to explain how users should read the dashboard, navigate categories, and apply the data to positioning decisions.",
 };
 
 const emptyPosition: PositionForm = {
@@ -473,6 +476,7 @@ export function useDashboardMetrics(email: string | null) {
         dailyMacroScore: String(data.dailyMacroScore ?? ""),
         monthlyMacroScore: String(data.monthlyMacroScore ?? ""),
         regimeExplanation: String(data.regimeExplanation ?? ""),
+        navigationGuideText: String(data.navigationGuideText ?? ""),
       });
       setDashboardMetricsSavedAt(data.updatedAt ?? null);
       setDashboardMetricsError(null);
@@ -515,6 +519,7 @@ export function useDashboardMetrics(email: string | null) {
             "monthly macro score"
           ),
           regimeExplanation: dashboardMetrics.regimeExplanation,
+          navigationGuideText: dashboardMetrics.navigationGuideText,
         }),
       });
 
@@ -534,6 +539,7 @@ export function useDashboardMetrics(email: string | null) {
           dailyMacroScore: String(data.dailyMacroScore ?? ""),
           monthlyMacroScore: String(data.monthlyMacroScore ?? ""),
           regimeExplanation: String(data.regimeExplanation ?? ""),
+          navigationGuideText: String(data.navigationGuideText ?? ""),
         });
         setDashboardMetricsSavedAt(data.updatedAt ?? new Date().toISOString());
       }

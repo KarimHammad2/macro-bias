@@ -83,7 +83,7 @@ export function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-4 pb-20 pt-32 sm:px-6 sm:pt-40 lg:px-8 lg:pb-24 lg:pt-56">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-4 pb-12 pt-32 sm:px-6 sm:pb-20 sm:pt-40 lg:px-8 lg:pb-24 lg:pt-56">
         <div
           className={`max-w-3xl transition-all duration-1000 ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"

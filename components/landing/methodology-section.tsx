@@ -159,8 +159,8 @@ function DotPortrait({ position }: { position: "left" | "right" }) {
   return (
     <canvas
       ref={canvasRef}
-      className="h-80 w-64 md:h-96 md:w-80"
-      style={{ width: "100%", maxWidth: "320px", height: "400px" }}
+      className="h-64 w-52 md:h-96 md:w-80"
+      style={{ width: "100%", maxWidth: "320px", height: "clamp(260px, 72vw, 400px)" }}
     />
   );
 }
@@ -170,7 +170,7 @@ export function MethodologySection() {
   const section2 = useScrollAnimation();
 
   return (
-    <section id="methodology" className="bg-[#030712] pt-32 pb-24 sm:pt-40 sm:pb-32">
+    <section id="methodology" className="bg-[#030712] pt-20 pb-24 sm:pt-28 sm:pb-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* First block - Framework Origin */}
         <div
