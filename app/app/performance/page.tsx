@@ -32,10 +32,19 @@ function computeCompoundedAnnualizedReturn(
   return (Math.pow(endingValue, 1 / data.length) - 1) * 100;
 }
 
+function computeCompoundedTotalReturn(
+  data: YearlyPerformanceRow[],
+  key: "macroBias" | "sp500"
+): number {
+  if (data.length === 0) return 0;
+  const endingValue = data.reduce((acc, row) => acc * (1 + row[key] / 100), 1);
+  return (endingValue - 1) * 100;
+}
+
 function computeRolling(data: YearlyPerformanceRow[], years: number) {
   const window = data.slice(-years);
-  const macroBias = computeCompoundedAnnualizedReturn(window, "macroBias");
-  const sp500 = computeCompoundedAnnualizedReturn(window, "sp500");
+  const macroBias = computeCompoundedTotalReturn(window, "macroBias");
+  const sp500 = computeCompoundedTotalReturn(window, "sp500");
   return {
     macroBias,
     sp500,

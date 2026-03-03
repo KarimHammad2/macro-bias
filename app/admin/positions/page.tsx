@@ -153,20 +153,6 @@ export default function PositionsPage() {
                 className="h-4 w-4 accent-slate-300"
               />
             </label>
-            <label className={labelClass}>
-              Run Progression Order
-              <input
-                type="number"
-                step="1"
-                min="1"
-                disabled={!positionDraft.isInRunProgression}
-                value={positionDraft.runProgressionOrder}
-                onChange={(event) =>
-                  handlePositionDraftChange("runProgressionOrder", event.target.value)
-                }
-                className={inputClass}
-              />
-            </label>
           </div>
           <div className="mt-4 flex items-center justify-end">
             <button
@@ -210,7 +196,6 @@ export default function PositionsPage() {
                   <th className="hidden w-[11%] px-2 py-2 font-medium xl:table-cell">
                     Run Progression
                   </th>
-                  <th className="hidden w-[5%] px-2 py-2 font-medium xl:table-cell">Order</th>
                   <th className="w-[13%] pl-2 pr-8 py-2 font-medium text-right whitespace-nowrap">
                     Actions
                   </th>
@@ -219,7 +204,7 @@ export default function PositionsPage() {
               <tbody className="divide-y divide-slate-800 bg-[#0a1628]">
                 {positions.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="px-2 py-4 text-center text-slate-500">
+                    <td colSpan={9} className="px-2 py-4 text-center text-slate-500">
                       No positions yet.
                     </td>
                   </tr>
@@ -369,9 +354,6 @@ export default function PositionsPage() {
                                     ? {
                                         ...prev,
                                         isInRunProgression: event.target.checked,
-                                        runProgressionOrder: event.target.checked
-                                          ? prev.runProgressionOrder
-                                          : "",
                                       }
                                     : prev
                                 )
@@ -384,31 +366,6 @@ export default function PositionsPage() {
                             </span>
                           ) : (
                             <span className="text-xs text-slate-500">No</span>
-                          )}
-                        </td>
-                        <td className="hidden px-2 py-2 text-slate-200 xl:table-cell">
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              inputMode="numeric"
-                              disabled={!editingPosition?.isInRunProgression}
-                              value={editingPosition?.runProgressionOrder ?? ""}
-                              onChange={(event) =>
-                                setEditingPosition((prev) =>
-                                  prev
-                                    ? {
-                                        ...prev,
-                                        runProgressionOrder: event.target.value,
-                                      }
-                                    : prev
-                                )
-                              }
-                              className={compactInputClass}
-                            />
-                          ) : position.runProgressionOrder != null ? (
-                            position.runProgressionOrder
-                          ) : (
-                            <span className="text-xs text-slate-500">-</span>
                           )}
                         </td>
                         <td className="pl-2 pr-8 py-2 text-right whitespace-nowrap">
