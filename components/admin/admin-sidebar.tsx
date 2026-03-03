@@ -11,6 +11,10 @@ const navItems = [
   { name: "Performance", href: "/admin/performance" },
   { name: "Positions", href: "/admin/positions" },
   { name: "Products", href: "/admin/products" },
+  {
+    name: "Nagivation Guide",
+    href: "/admin/navigation-guides",
+  },
   { name: "Admins & Users", href: "/admin/admins-users" },
 ];
 

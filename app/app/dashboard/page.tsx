@@ -8,7 +8,6 @@ type DashboardMetrics = {
   dailyMacroScore: number;
   monthlyMacroScore: number;
   regimeExplanation: string;
-  navigationGuideText: string;
 };
 
 type Position = {
@@ -19,6 +18,9 @@ type Position = {
   stopLoss: number;
   positionSize: number;
   unrealizedPnL: number;
+  isActive: boolean;
+  isInRunProgression: boolean;
+  runProgressionOrder: number | null;
   createdAt?: string;
 };
 
@@ -48,8 +50,6 @@ const defaultDashboardMetrics: DashboardMetrics = {
   monthlyMacroScore: 0.71,
   regimeExplanation:
     "Current macro conditions favor equity exposure. Liquidity conditions are supportive, volatility is contained, and economic indicators suggest continued growth momentum. Consider maintaining or increasing leveraged long positions according to your risk parameters.",
-  navigationGuideText:
-    "Use this section to explain how users should read the dashboard, navigate categories, and apply the data to positioning decisions.",
 };
 
 function PositionsTable({
@@ -229,7 +229,6 @@ export default function DashboardPage() {
           dailyMacroScore: payload.metrics.dailyMacroScore,
           monthlyMacroScore: payload.metrics.monthlyMacroScore,
           regimeExplanation: payload.metrics.regimeExplanation,
-          navigationGuideText: payload.metrics.navigationGuideText ?? "",
         });
         setMetricsError(null);
       }
@@ -269,8 +268,18 @@ export default function DashboardPage() {
     if (score < -0.5) return "negative";
     return "default";
   };
-  const activePosition = positions[0] ?? null;
-  const priorRuns = positions.slice(1, 4);
+  const activePosition = positions.find((position) => position.isActive) ?? null;
+  const orderedRunProgression = [...positions]
+    .filter((position) => position.isInRunProgression)
+    .sort((a, b) => {
+      const aOrder = a.runProgressionOrder ?? Number.POSITIVE_INFINITY;
+      const bOrder = b.runProgressionOrder ?? Number.POSITIVE_INFINITY;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return (a.createdAt ?? "").localeCompare(b.createdAt ?? "");
+    });
+  const runProgression = activePosition
+    ? [activePosition, ...orderedRunProgression.filter((p) => p.id !== activePosition.id)]
+    : orderedRunProgression;
   const sortedProducts = [...products].sort((a, b) => {
     if (a.exposureType === b.exposureType) {
       return leverageRank(a.leverage) - leverageRank(b.leverage);
@@ -319,18 +328,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-6">
-        <h2 className="text-lg font-semibold text-foreground">
-          Dashboard Navigation Guide
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          How to use each section and interpret positioning data.
-        </p>
-        <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-          {metrics.navigationGuideText}
-        </p>
-      </div>
-
       {/* Current positioning table */}
       <div className="rounded-xl border border-border bg-card">
         <div className="border-b border-border p-6">
@@ -347,26 +344,29 @@ export default function DashboardPage() {
             Run progression
           </h3>
           <div className="mt-3 space-y-2">
-            {(activePosition ? [activePosition, ...priorRuns] : priorRuns).map(
-              (position) => (
-                <p key={position.id} className="text-sm text-foreground">
-                  <span className="font-medium">{position.exposureType}</span> opened at{" "}
-                  <span className="font-mono">${position.entryPrice.toFixed(2)}</span>, stop at{" "}
-                  <span className="font-mono">${position.stopLoss.toFixed(2)}</span>, profit:{" "}
-                  <span
-                    className={cn(
-                      "font-mono font-semibold",
-                      position.unrealizedPnL >= 0 ? "text-positive" : "text-negative"
-                    )}
-                  >
-                    {position.unrealizedPnL >= 0 ? "+" : ""}$
-                    {position.unrealizedPnL.toFixed(2)}
-                  </span>
-                </p>
-              )
-            )}
+            {runProgression.map((position) => (
+              <p key={position.id} className="text-sm text-foreground">
+                <span className="font-medium">{position.exposureType}</span> opened at{" "}
+                <span className="font-mono">${position.entryPrice.toFixed(2)}</span>, stop at{" "}
+                <span className="font-mono">${position.stopLoss.toFixed(2)}</span>, profit:{" "}
+                <span
+                  className={cn(
+                    "font-mono font-semibold",
+                    position.unrealizedPnL >= 0 ? "text-positive" : "text-negative"
+                  )}
+                >
+                  {position.unrealizedPnL >= 0 ? "+" : ""}$
+                  {position.unrealizedPnL.toFixed(2)}
+                </span>
+              </p>
+            ))}
             {!activePosition && !positionsError ? (
-              <p className="text-sm text-muted-foreground">No active position available.</p>
+              <p className="text-sm text-muted-foreground">No active position selected.</p>
+            ) : null}
+            {runProgression.length === 0 && !positionsError ? (
+              <p className="text-sm text-muted-foreground">
+                No run progression positions selected.
+              </p>
             ) : null}
           </div>
         </div>

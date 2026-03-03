@@ -131,6 +131,42 @@ export default function PositionsPage() {
                 className={inputClass}
               />
             </label>
+            <label className={`${labelClass} flex-row items-center justify-between`}>
+              <span>Active Position</span>
+              <input
+                type="checkbox"
+                checked={positionDraft.isActive}
+                onChange={(event) =>
+                  handlePositionDraftChange("isActive", event.target.checked)
+                }
+                className="h-4 w-4 accent-slate-300"
+              />
+            </label>
+            <label className={`${labelClass} flex-row items-center justify-between`}>
+              <span>Include In Run Progression</span>
+              <input
+                type="checkbox"
+                checked={positionDraft.isInRunProgression}
+                onChange={(event) =>
+                  handlePositionDraftChange("isInRunProgression", event.target.checked)
+                }
+                className="h-4 w-4 accent-slate-300"
+              />
+            </label>
+            <label className={labelClass}>
+              Run Progression Order
+              <input
+                type="number"
+                step="1"
+                min="1"
+                disabled={!positionDraft.isInRunProgression}
+                value={positionDraft.runProgressionOrder}
+                onChange={(event) =>
+                  handlePositionDraftChange("runProgressionOrder", event.target.value)
+                }
+                className={inputClass}
+              />
+            </label>
           </div>
           <div className="mt-4 flex items-center justify-end">
             <button
@@ -159,18 +195,23 @@ export default function PositionsPage() {
             </div>
           </div>
           <div className="mt-4 overflow-hidden rounded-xl border border-slate-800/60">
-            <table className="min-w-full table-fixed divide-y divide-slate-800 text-sm">
-              <thead className="bg-[#0f1d33] text-left text-xs uppercase tracking-wider text-slate-500">
+            <table className="min-w-full table-fixed divide-y divide-slate-800 text-xs">
+              <thead className="bg-[#0f1d33] text-left text-[11px] uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Exposure</th>
-                  <th className="px-4 py-3 font-medium">Instrument</th>
-                  <th className="px-4 py-3 font-medium">Entry</th>
-                  <th className="hidden px-4 py-3 font-medium lg:table-cell">Stop</th>
-                  <th className="px-4 py-3 font-medium">Size</th>
-                  <th className="hidden px-4 py-3 font-medium xl:table-cell">
+                  <th className="w-[10%] px-2 py-2 font-medium">Exposure</th>
+                  <th className="w-[18%] px-2 py-2 font-medium">Instrument</th>
+                  <th className="w-[8%] px-2 py-2 font-medium">Entry</th>
+                  <th className="hidden w-[8%] px-2 py-2 font-medium lg:table-cell">Stop</th>
+                  <th className="w-[9%] px-2 py-2 font-medium">Size</th>
+                  <th className="hidden w-[10%] px-2 py-2 font-medium xl:table-cell">
                     Unrealized
                   </th>
-                  <th className="px-4 py-3 font-medium text-right whitespace-nowrap">
+                  <th className="hidden w-[8%] px-2 py-2 font-medium lg:table-cell">Active</th>
+                  <th className="hidden w-[11%] px-2 py-2 font-medium xl:table-cell">
+                    Run Progression
+                  </th>
+                  <th className="hidden w-[5%] px-2 py-2 font-medium xl:table-cell">Order</th>
+                  <th className="w-[13%] pl-2 pr-8 py-2 font-medium text-right whitespace-nowrap">
                     Actions
                   </th>
                 </tr>
@@ -178,7 +219,7 @@ export default function PositionsPage() {
               <tbody className="divide-y divide-slate-800 bg-[#0a1628]">
                 {positions.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-6 text-center text-slate-500">
+                    <td colSpan={10} className="px-2 py-4 text-center text-slate-500">
                       No positions yet.
                     </td>
                   </tr>
@@ -187,7 +228,7 @@ export default function PositionsPage() {
                     const isEditing = editingPositionId === position.id;
                     return (
                       <tr key={position.id}>
-                        <td className="px-4 py-3 text-slate-200">
+                        <td className="px-2 py-2 text-slate-200">
                           {isEditing ? (
                             <input
                               value={editingPosition?.exposureType ?? ""}
@@ -204,7 +245,7 @@ export default function PositionsPage() {
                             position.exposureType
                           )}
                         </td>
-                        <td className="px-4 py-3 text-slate-200">
+                        <td className="px-2 py-2 text-slate-200">
                           {isEditing ? (
                             <input
                               value={editingPosition?.instrument ?? ""}
@@ -218,14 +259,14 @@ export default function PositionsPage() {
                               className={compactInputClass}
                             />
                           ) : (
-                            position.instrument
+                            <span className="block truncate">{position.instrument}</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-slate-200">
+                        <td className="px-2 py-2 text-slate-200">
                           {isEditing ? (
                             <input
-                              type="number"
-                              step="0.01"
+                              type="text"
+                              inputMode="decimal"
                               value={editingPosition?.entryPrice ?? ""}
                               onChange={(event) =>
                                 setEditingPosition((prev) =>
@@ -240,11 +281,11 @@ export default function PositionsPage() {
                             position.entryPrice
                           )}
                         </td>
-                        <td className="hidden px-4 py-3 text-slate-200 lg:table-cell">
+                        <td className="hidden px-2 py-2 text-slate-200 lg:table-cell">
                           {isEditing ? (
                             <input
-                              type="number"
-                              step="0.01"
+                              type="text"
+                              inputMode="decimal"
                               value={editingPosition?.stopLoss ?? ""}
                               onChange={(event) =>
                                 setEditingPosition((prev) =>
@@ -259,11 +300,11 @@ export default function PositionsPage() {
                             position.stopLoss
                           )}
                         </td>
-                        <td className="px-4 py-3 text-slate-200">
+                        <td className="px-2 py-2 text-slate-200">
                           {isEditing ? (
                             <input
-                              type="number"
-                              step="1"
+                              type="text"
+                              inputMode="numeric"
                               value={editingPosition?.positionSize ?? ""}
                               onChange={(event) =>
                                 setEditingPosition((prev) =>
@@ -278,11 +319,11 @@ export default function PositionsPage() {
                             position.positionSize
                           )}
                         </td>
-                        <td className="hidden px-4 py-3 text-slate-200 xl:table-cell">
+                        <td className="hidden px-2 py-2 text-slate-200 xl:table-cell">
                           {isEditing ? (
                             <input
-                              type="number"
-                              step="0.01"
+                              type="text"
+                              inputMode="decimal"
                               value={editingPosition?.unrealizedPnL ?? ""}
                               onChange={(event) =>
                                 setEditingPosition((prev) =>
@@ -297,13 +338,86 @@ export default function PositionsPage() {
                             position.unrealizedPnL
                           )}
                         </td>
-                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <td className="hidden px-2 py-2 text-slate-200 lg:table-cell">
                           {isEditing ? (
-                            <div className="flex items-center justify-end gap-2">
+                            <input
+                              type="checkbox"
+                              checked={editingPosition?.isActive ?? false}
+                              onChange={(event) =>
+                                setEditingPosition((prev) =>
+                                  prev ? { ...prev, isActive: event.target.checked } : prev
+                                )
+                              }
+                              className="h-4 w-4 accent-slate-300"
+                            />
+                          ) : position.isActive ? (
+                            <span className="rounded-full bg-green-500/15 px-2 py-1 text-xs text-green-300">
+                              Active
+                            </span>
+                          ) : (
+                            <span className="text-xs text-slate-500">No</span>
+                          )}
+                        </td>
+                        <td className="hidden px-2 py-2 text-slate-200 xl:table-cell">
+                          {isEditing ? (
+                            <input
+                              type="checkbox"
+                              checked={editingPosition?.isInRunProgression ?? false}
+                              onChange={(event) =>
+                                setEditingPosition((prev) =>
+                                  prev
+                                    ? {
+                                        ...prev,
+                                        isInRunProgression: event.target.checked,
+                                        runProgressionOrder: event.target.checked
+                                          ? prev.runProgressionOrder
+                                          : "",
+                                      }
+                                    : prev
+                                )
+                              }
+                              className="h-4 w-4 accent-slate-300"
+                            />
+                          ) : position.isInRunProgression ? (
+                            <span className="rounded-full bg-blue-500/15 px-2 py-1 text-xs text-blue-300">
+                              Included
+                            </span>
+                          ) : (
+                            <span className="text-xs text-slate-500">No</span>
+                          )}
+                        </td>
+                        <td className="hidden px-2 py-2 text-slate-200 xl:table-cell">
+                          {isEditing ? (
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              disabled={!editingPosition?.isInRunProgression}
+                              value={editingPosition?.runProgressionOrder ?? ""}
+                              onChange={(event) =>
+                                setEditingPosition((prev) =>
+                                  prev
+                                    ? {
+                                        ...prev,
+                                        runProgressionOrder: event.target.value,
+                                      }
+                                    : prev
+                                )
+                              }
+                              className={compactInputClass}
+                            />
+                          ) : position.runProgressionOrder != null ? (
+                            position.runProgressionOrder
+                          ) : (
+                            <span className="text-xs text-slate-500">-</span>
+                          )}
+                        </td>
+                        <td className="pl-2 pr-8 py-2 text-right whitespace-nowrap">
+                          {isEditing ? (
+                            <div className="flex items-center justify-end gap-1 pr-1">
                               <button
                                 type="button"
                                 onClick={() => handleSavePosition(position.id)}
-                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-xs text-slate-200 hover:border-slate-600/80"
+                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-[11px] text-slate-200 hover:border-slate-600/80"
                               >
                                 Save
                               </button>
@@ -313,17 +427,17 @@ export default function PositionsPage() {
                                   setEditingPositionId(null);
                                   setEditingPosition(null);
                                 }}
-                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-xs text-slate-400 hover:text-slate-200"
+                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-[11px] text-slate-400 hover:text-slate-200"
                               >
                                 Cancel
                               </button>
                             </div>
                           ) : (
-                            <div className="flex items-center justify-end gap-2">
+                            <div className="flex items-center justify-end gap-1 pr-1">
                               <button
                                 type="button"
                                 onClick={() => handleEditPosition(position)}
-                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-xs text-slate-200 hover:border-slate-600/80"
+                                className="rounded-lg border border-slate-700/60 px-2 py-1 text-[11px] text-slate-200 hover:border-slate-600/80"
                               >
                                 Edit
                               </button>
@@ -331,7 +445,7 @@ export default function PositionsPage() {
                                 <AlertDialogTrigger asChild>
                                   <button
                                     type="button"
-                                    className="rounded-lg border border-red-500/40 px-2 py-1 text-xs text-red-300 hover:border-red-400"
+                                    className="rounded-lg border border-red-500/40 px-2 py-1 text-[11px] text-red-300 hover:border-red-400"
                                   >
                                     Delete
                                   </button>

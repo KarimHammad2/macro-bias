@@ -78,20 +78,6 @@ export default function DashboardMetricsPage() {
           </label>
         </div>
 
-        <div className="mt-4">
-          <label className={labelClass}>
-            Dashboard Navigation Guide
-            <textarea
-              rows={6}
-              value={dashboardMetrics?.navigationGuideText ?? ""}
-              onChange={(event) =>
-                handleDashboardMetricsChange("navigationGuideText", event.target.value)
-              }
-              className={inputClass}
-            />
-          </label>
-        </div>
-
         <div className="mt-4 flex items-center justify-end">
           <button
             type="button"

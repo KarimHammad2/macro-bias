@@ -38,6 +38,35 @@ create table if not exists public.dashboard_metrics (
   updated_at timestamptz not null default now()
 );
 
+alter table public.dashboard_metrics
+  add column if not exists navigation_guide_text text not null default '';
+
+create table if not exists public.navigation_guides (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text not null default '',
+  body text not null default '',
+  file_name text,
+  file_path text,
+  mime_type text,
+  file_size_bytes bigint,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.navigation_guides
+  add column if not exists file_name text;
+
+alter table public.navigation_guides
+  add column if not exists file_path text;
+
+alter table public.navigation_guides
+  add column if not exists mime_type text;
+
+alter table public.navigation_guides
+  add column if not exists file_size_bytes bigint;
+
 create table if not exists public.positions (
   id uuid primary key default gen_random_uuid(),
   exposure_type text not null,
@@ -46,9 +75,21 @@ create table if not exists public.positions (
   stop_loss numeric not null,
   position_size numeric not null,
   unrealized_pnl numeric not null,
+  is_active boolean not null default false,
+  is_in_run_progression boolean not null default false,
+  run_progression_order integer,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.positions
+  add column if not exists is_active boolean not null default false;
+
+alter table public.positions
+  add column if not exists is_in_run_progression boolean not null default false;
+
+alter table public.positions
+  add column if not exists run_progression_order integer;
 
 create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
@@ -76,6 +117,7 @@ alter table public.access_requests enable row level security;
 alter table public.admins enable row level security;
 alter table public.homepage_metrics enable row level security;
 alter table public.dashboard_metrics enable row level security;
+alter table public.navigation_guides enable row level security;
 alter table public.positions enable row level security;
 alter table public.products enable row level security;
 alter table public.performance_yearly enable row level security;
@@ -90,6 +132,10 @@ drop policy if exists "allow_admin_update_homepage_metrics" on public.homepage_m
 drop policy if exists "allow_admin_select_dashboard_metrics" on public.dashboard_metrics;
 drop policy if exists "allow_admin_insert_dashboard_metrics" on public.dashboard_metrics;
 drop policy if exists "allow_admin_update_dashboard_metrics" on public.dashboard_metrics;
+drop policy if exists "allow_admin_select_navigation_guides" on public.navigation_guides;
+drop policy if exists "allow_admin_insert_navigation_guides" on public.navigation_guides;
+drop policy if exists "allow_admin_update_navigation_guides" on public.navigation_guides;
+drop policy if exists "allow_admin_delete_navigation_guides" on public.navigation_guides;
 drop policy if exists "allow_admin_select_positions" on public.positions;
 drop policy if exists "allow_admin_insert_positions" on public.positions;
 drop policy if exists "allow_admin_update_positions" on public.positions;
@@ -189,6 +235,50 @@ create policy "allow_admin_insert_dashboard_metrics" on public.dashboard_metrics
 
 create policy "allow_admin_update_dashboard_metrics" on public.dashboard_metrics
   for update
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
+create policy "allow_admin_select_navigation_guides" on public.navigation_guides
+  for select
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
+create policy "allow_admin_insert_navigation_guides" on public.navigation_guides
+  for insert
+  to authenticated
+  with check (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
+create policy "allow_admin_update_navigation_guides" on public.navigation_guides
+  for update
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
+create policy "allow_admin_delete_navigation_guides" on public.navigation_guides
+  for delete
   to authenticated
   using (
     exists (
@@ -376,6 +466,20 @@ values (
 )
 on conflict (key) do nothing;
 
+insert into public.navigation_guides (
+  title,
+  description,
+  body,
+  sort_order
+)
+values (
+  'Operational Dashboard Navigation Guide',
+  'How to navigate and interpret the Operational Dashboard.',
+  'Use this page to explain each dashboard section, how to read the data, and how users should apply the insights in their decision process.',
+  1
+)
+on conflict do nothing;
+
 insert into public.positions (
   id,
   exposure_type,
@@ -383,7 +487,10 @@ insert into public.positions (
   entry_price,
   stop_loss,
   position_size,
-  unrealized_pnl
+  unrealized_pnl,
+  is_active,
+  is_in_run_progression,
+  run_progression_order
 )
 values
   (
@@ -393,7 +500,10 @@ values
     142.50,
     128.25,
     10000,
-    1250.00
+    1250.00,
+    true,
+    true,
+    1
   ),
   (
     '4b97d4d2-3f5f-4b18-8d12-c89b9f2d2f90',
@@ -402,7 +512,10 @@ values
     85.20,
     72.42,
     15000,
-    2340.00
+    2340.00,
+    false,
+    true,
+    2
   ),
   (
     'b9a6d2a2-3e74-4b6c-9f41-f7c3b0cdbf17',
@@ -411,7 +524,10 @@ values
     12.80,
     14.08,
     5000,
-    -320.00
+    -320.00,
+    false,
+    false,
+    null
   )
 on conflict (id) do nothing;
 

@@ -9,6 +9,9 @@ type PositionPayload = {
   stopLoss: number;
   positionSize: number;
   unrealizedPnL: number;
+  isActive: boolean;
+  isInRunProgression: boolean;
+  runProgressionOrder: number | null;
   createdAt?: string;
 };
 
@@ -20,6 +23,9 @@ function mapPositionRow(row: {
   stop_loss: number;
   position_size: number;
   unrealized_pnl: number;
+  is_active: boolean;
+  is_in_run_progression: boolean;
+  run_progression_order: number | null;
   created_at: string;
 }): PositionPayload & { id: string } {
   return {
@@ -30,6 +36,9 @@ function mapPositionRow(row: {
     stopLoss: row.stop_loss,
     positionSize: row.position_size,
     unrealizedPnL: row.unrealized_pnl,
+    isActive: row.is_active,
+    isInRunProgression: row.is_in_run_progression,
+    runProgressionOrder: row.run_progression_order,
     createdAt: row.created_at,
   };
 }
@@ -40,6 +49,19 @@ function parseNumber(value: unknown, fieldName: string): number {
     throw new Error(`Invalid ${fieldName}.`);
   }
   return parsed;
+}
+
+function parseBoolean(value: unknown): boolean {
+  return value === true;
+}
+
+function parseRunProgressionOrder(value: unknown): number | null {
+  if (value == null || value === "") return null;
+  const parsed = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(parsed)) {
+    throw new Error("Invalid run progression order.");
+  }
+  return Math.round(parsed);
 }
 
 async function requireAdmin(email: string) {
@@ -65,8 +87,9 @@ export async function GET() {
     const { data, error } = await supabase
       .from("positions")
       .select(
-        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl, created_at"
+        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl, is_active, is_in_run_progression, run_progression_order, created_at"
       )
+      .order("run_progression_order", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -100,7 +123,21 @@ export async function POST(request: Request) {
       stopLoss: parseNumber(body?.stopLoss, "stop loss"),
       positionSize: parseNumber(body?.positionSize, "position size"),
       unrealizedPnL: parseNumber(body?.unrealizedPnL, "unrealized P&L"),
+      isActive: parseBoolean(body?.isActive),
+      isInRunProgression: parseBoolean(body?.isInRunProgression),
+      runProgressionOrder: parseRunProgressionOrder(body?.runProgressionOrder),
     };
+
+    const normalizedRunOrder = payload.isInRunProgression
+      ? payload.runProgressionOrder
+      : null;
+
+    if (payload.isActive) {
+      await supabase
+        .from("positions")
+        .update({ is_active: false })
+        .not("id", "is", null);
+    }
 
     const { data, error } = await supabase
       .from("positions")
@@ -111,10 +148,13 @@ export async function POST(request: Request) {
         stop_loss: payload.stopLoss,
         position_size: payload.positionSize,
         unrealized_pnl: payload.unrealizedPnL,
+        is_active: payload.isActive,
+        is_in_run_progression: payload.isInRunProgression,
+        run_progression_order: normalizedRunOrder,
         updated_at: new Date().toISOString(),
       })
       .select(
-        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl, created_at"
+        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl, is_active, is_in_run_progression, run_progression_order, created_at"
       )
       .maybeSingle();
 
@@ -153,7 +193,21 @@ export async function PUT(request: Request) {
       stopLoss: parseNumber(body?.stopLoss, "stop loss"),
       positionSize: parseNumber(body?.positionSize, "position size"),
       unrealizedPnL: parseNumber(body?.unrealizedPnL, "unrealized P&L"),
+      isActive: parseBoolean(body?.isActive),
+      isInRunProgression: parseBoolean(body?.isInRunProgression),
+      runProgressionOrder: parseRunProgressionOrder(body?.runProgressionOrder),
     };
+
+    const normalizedRunOrder = payload.isInRunProgression
+      ? payload.runProgressionOrder
+      : null;
+
+    if (payload.isActive) {
+      await supabase
+        .from("positions")
+        .update({ is_active: false })
+        .neq("id", id);
+    }
 
     const { data, error } = await supabase
       .from("positions")
@@ -164,11 +218,14 @@ export async function PUT(request: Request) {
         stop_loss: payload.stopLoss,
         position_size: payload.positionSize,
         unrealized_pnl: payload.unrealizedPnL,
+        is_active: payload.isActive,
+        is_in_run_progression: payload.isInRunProgression,
+        run_progression_order: normalizedRunOrder,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)
       .select(
-        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl, created_at"
+        "id, exposure_type, instrument, entry_price, stop_loss, position_size, unrealized_pnl, is_active, is_in_run_progression, run_progression_order, created_at"
       )
       .maybeSingle();
 

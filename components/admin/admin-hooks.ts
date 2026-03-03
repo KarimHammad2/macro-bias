@@ -31,6 +31,26 @@ export type DashboardMetricsForm = {
   navigationGuideText: string;
 };
 
+export type NavigationGuide = {
+  id: string;
+  title: string;
+  description: string;
+  body?: string;
+  fileName?: string | null;
+  filePath?: string | null;
+  mimeType?: string | null;
+  fileSizeBytes?: number | null;
+  downloadUrl?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type NavigationGuideForm = {
+  title: string;
+  description: string;
+  file: File | null;
+};
+
 export type Position = {
   id: string;
   exposureType: string;
@@ -39,6 +59,9 @@ export type Position = {
   stopLoss: number;
   positionSize: number;
   unrealizedPnL: number;
+  isActive: boolean;
+  isInRunProgression: boolean;
+  runProgressionOrder: number | null;
 };
 
 export type PositionForm = {
@@ -48,6 +71,9 @@ export type PositionForm = {
   stopLoss: string;
   positionSize: string;
   unrealizedPnL: string;
+  isActive: boolean;
+  isInRunProgression: boolean;
+  runProgressionOrder: string;
 };
 
 export type Product = {
@@ -119,6 +145,9 @@ const emptyPosition: PositionForm = {
   stopLoss: "",
   positionSize: "",
   unrealizedPnL: "",
+  isActive: false,
+  isInRunProgression: false,
+  runProgressionOrder: "",
 };
 
 const emptyProduct: ProductForm = {
@@ -135,6 +164,12 @@ const emptyPerformanceYearly: PerformanceYearlyForm = {
   macroBias: "",
   sp500: "",
   alpha: "",
+};
+
+const emptyNavigationGuide: NavigationGuideForm = {
+  title: "",
+  description: "",
+  file: null,
 };
 
 export function useAdminSession() {
@@ -589,7 +624,10 @@ export function usePositions(email: string | null) {
     loadPositions();
   }, []);
 
-  const handlePositionDraftChange = (field: keyof PositionForm, value: string) => {
+  const handlePositionDraftChange = <K extends keyof PositionForm>(
+    field: K,
+    value: PositionForm[K]
+  ) => {
     setPositionDraft((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -619,6 +657,14 @@ export function usePositions(email: string | null) {
             positionDraft.unrealizedPnL,
             "unrealized P&L"
           ),
+          isActive: positionDraft.isActive,
+          isInRunProgression: positionDraft.isInRunProgression,
+          runProgressionOrder: positionDraft.isInRunProgression
+            ? parseNumberInput(
+                positionDraft.runProgressionOrder,
+                "run progression order"
+              )
+            : null,
         }),
       });
 
@@ -656,6 +702,12 @@ export function usePositions(email: string | null) {
       stopLoss: String(position.stopLoss),
       positionSize: String(position.positionSize),
       unrealizedPnL: String(position.unrealizedPnL),
+      isActive: position.isActive,
+      isInRunProgression: position.isInRunProgression,
+      runProgressionOrder:
+        position.runProgressionOrder != null
+          ? String(position.runProgressionOrder)
+          : "",
     });
   };
 
@@ -687,6 +739,14 @@ export function usePositions(email: string | null) {
             editingPosition.unrealizedPnL,
             "unrealized P&L"
           ),
+          isActive: editingPosition.isActive,
+          isInRunProgression: editingPosition.isInRunProgression,
+          runProgressionOrder: editingPosition.isInRunProgression
+            ? parseNumberInput(
+                editingPosition.runProgressionOrder,
+                "run progression order"
+              )
+            : null,
         }),
       });
 
@@ -1183,5 +1243,214 @@ export function usePerformanceYearly(email: string | null) {
     handleEditPerformance,
     handleSavePerformance,
     handleDeletePerformance,
+  };
+}
+
+export function useNavigationGuides(email: string | null) {
+  const [guides, setGuides] = useState<NavigationGuide[]>([]);
+  const [guidesError, setGuidesError] = useState<string | null>(null);
+  const [isSavingGuide, setIsSavingGuide] = useState(false);
+  const [guideDraft, setGuideDraft] = useState<NavigationGuideForm>(emptyNavigationGuide);
+  const [editingGuideId, setEditingGuideId] = useState<string | null>(null);
+  const [editingGuide, setEditingGuide] = useState<NavigationGuideForm | null>(null);
+
+  useEffect(() => {
+    const loadGuides = async () => {
+      const response = await fetch("/api/admin/navigation-guides");
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        setGuidesError(payload?.message || "Unable to load navigation guides.");
+        return;
+      }
+      const payload = await response.json().catch(() => null);
+      setGuides(payload?.guides ?? []);
+      setGuidesError(null);
+    };
+
+    loadGuides();
+  }, []);
+
+  const handleGuideDraftChange = <K extends keyof NavigationGuideForm>(
+    field: K,
+    value: NavigationGuideForm[K]
+  ) => {
+    setGuideDraft((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAddGuide = async () => {
+    if (!email) {
+      const message = "Missing admin email. Please sign in again.";
+      setGuidesError(message);
+      toast.error(message);
+      return;
+    }
+
+    setIsSavingGuide(true);
+    setGuidesError(null);
+
+    try {
+      const form = new FormData();
+      form.append("email", email);
+      form.append("title", guideDraft.title);
+      form.append("description", guideDraft.description);
+      if (guideDraft.file) {
+        form.append("file", guideDraft.file);
+      }
+
+      const response = await fetch("/api/admin/navigation-guides", {
+        method: "POST",
+        body: form,
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        const message = payload?.message || "Unable to add navigation guide.";
+        setGuidesError(message);
+        toast.error(message);
+        setIsSavingGuide(false);
+        return;
+      }
+
+      const payload = await response.json().catch(() => null);
+      if (payload?.guide) {
+        setGuides((prev) => [...prev, payload.guide]);
+        setGuideDraft(emptyNavigationGuide);
+        toast.success("Navigation guide added.");
+      }
+    } catch (saveError) {
+      const message =
+        saveError instanceof Error
+          ? saveError.message
+          : "Unable to add navigation guide.";
+      setGuidesError(message);
+      toast.error(message);
+    } finally {
+      setIsSavingGuide(false);
+    }
+  };
+
+  const handleEditGuide = (guide: NavigationGuide) => {
+    setEditingGuideId(guide.id);
+    setEditingGuide({
+      title: guide.title,
+      description: guide.description,
+      file: null,
+    });
+  };
+
+  const handleSaveGuide = async (id: string) => {
+    if (!email) {
+      const message = "Missing admin email. Please sign in again.";
+      setGuidesError(message);
+      toast.error(message);
+      return;
+    }
+    if (!editingGuide) return;
+
+    setIsSavingGuide(true);
+    setGuidesError(null);
+
+    try {
+      const form = new FormData();
+      form.append("email", email);
+      form.append("id", id);
+      form.append("title", editingGuide.title);
+      form.append("description", editingGuide.description);
+      if (editingGuide.file) {
+        form.append("file", editingGuide.file);
+      }
+
+      const response = await fetch("/api/admin/navigation-guides", {
+        method: "PUT",
+        body: form,
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        const message = payload?.message || "Unable to save navigation guide.";
+        setGuidesError(message);
+        toast.error(message);
+        setIsSavingGuide(false);
+        return;
+      }
+
+      const payload = await response.json().catch(() => null);
+      if (payload?.guide) {
+        setGuides((prev) => prev.map((item) => (item.id === id ? payload.guide : item)));
+        setEditingGuideId(null);
+        setEditingGuide(null);
+        toast.success("Navigation guide updated.");
+      }
+    } catch (saveError) {
+      const message =
+        saveError instanceof Error
+          ? saveError.message
+          : "Unable to save navigation guide.";
+      setGuidesError(message);
+      toast.error(message);
+    } finally {
+      setIsSavingGuide(false);
+    }
+  };
+
+  const handleDeleteGuide = async (id: string) => {
+    if (!email) {
+      const message = "Missing admin email. Please sign in again.";
+      setGuidesError(message);
+      toast.error(message);
+      return;
+    }
+
+    setIsSavingGuide(true);
+    setGuidesError(null);
+
+    try {
+      const response = await fetch("/api/admin/navigation-guides", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, id }),
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        const message = payload?.message || "Unable to delete navigation guide.";
+        setGuidesError(message);
+        toast.error(message);
+        setIsSavingGuide(false);
+        return;
+      }
+
+      setGuides((prev) => prev.filter((item) => item.id !== id));
+      if (editingGuideId === id) {
+        setEditingGuideId(null);
+        setEditingGuide(null);
+      }
+      toast.success("Navigation guide deleted.");
+    } catch (saveError) {
+      const message =
+        saveError instanceof Error
+          ? saveError.message
+          : "Unable to delete navigation guide.";
+      setGuidesError(message);
+      toast.error(message);
+    } finally {
+      setIsSavingGuide(false);
+    }
+  };
+
+  return {
+    guides,
+    guidesError,
+    isSavingGuide,
+    guideDraft,
+    editingGuideId,
+    editingGuide,
+    setEditingGuide,
+    setEditingGuideId,
+    handleGuideDraftChange,
+    handleAddGuide,
+    handleEditGuide,
+    handleSaveGuide,
+    handleDeleteGuide,
   };
 }

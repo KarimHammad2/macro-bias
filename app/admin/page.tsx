@@ -31,6 +31,11 @@ const cards = [
     href: "/admin/products",
   },
   {
+    title: "Nagivation Guide",
+    description: "Create and edit user-facing dashboard navigation documents.",
+    href: "/admin/navigation-guides",
+  },
+  {
     title: "Admins & Users",
     description: "Review access requests and manage admin access.",
     href: "/admin/admins-users",
