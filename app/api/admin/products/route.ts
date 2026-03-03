@@ -12,9 +12,8 @@ type ProductPayload = {
 };
 
 function normalizeLiquidity(liquidity: string): string {
-  return liquidity.toLowerCase() === "too low liquidity"
-    ? "Very low liquidity"
-    : liquidity;
+  const normalized = liquidity.trim().toLowerCase();
+  return normalized === "very low liquidity" ? "Very low liquidity" : liquidity;
 }
 
 function leverageRank(leverage: string): number {
@@ -40,6 +39,15 @@ function mapProductRow(row: {
     liquidity: normalizeLiquidity(row.liquidity),
     factsheetLink: row.factsheet_link,
   };
+}
+
+function liquidityRank(liquidity: string): number {
+  const label = normalizeLiquidity(liquidity).trim().toLowerCase();
+  if (label === "high") return 0;
+  if (label === "medium") return 1;
+  if (label === "low") return 2;
+  if (label === "very low liquidity") return 3;
+  return 4;
 }
 
 async function requireAdmin(email: string) {
@@ -77,6 +85,8 @@ export async function GET() {
       .map(mapProductRow)
       .sort((a, b) => {
         if (a.exposureType === b.exposureType) {
+          const liquidityDiff = liquidityRank(a.liquidity) - liquidityRank(b.liquidity);
+          if (liquidityDiff !== 0) return liquidityDiff;
           return leverageRank(a.leverage) - leverageRank(b.leverage);
         }
         return a.exposureType.localeCompare(b.exposureType);

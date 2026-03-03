@@ -40,9 +40,17 @@ function leverageRank(leverage: string): number {
 }
 
 function normalizeLiquidityLabel(liquidity: string): string {
-  return liquidity.toLowerCase() === "too low liquidity"
-    ? "Very low liquidity"
-    : liquidity;
+  const normalized = liquidity.trim().toLowerCase();
+  return normalized === "very low liquidity" ? "Very low liquidity" : liquidity;
+}
+
+function liquidityRank(liquidity: string): number {
+  const label = normalizeLiquidityLabel(liquidity).trim().toLowerCase();
+  if (label === "high") return 0;
+  if (label === "medium") return 1;
+  if (label === "low") return 2;
+  if (label === "very low liquidity") return 3;
+  return 4;
 }
 
 const defaultDashboardMetrics: DashboardMetrics = {
@@ -282,6 +290,8 @@ export default function DashboardPage() {
     : orderedRunProgression;
   const sortedProducts = [...products].sort((a, b) => {
     if (a.exposureType === b.exposureType) {
+      const liquidityDiff = liquidityRank(a.liquidity) - liquidityRank(b.liquidity);
+      if (liquidityDiff !== 0) return liquidityDiff;
       return leverageRank(a.leverage) - leverageRank(b.leverage);
     }
     return a.exposureType.localeCompare(b.exposureType);
@@ -382,7 +392,7 @@ export default function DashboardPage() {
             Products by Exposure Type
           </h2>
           <p className="text-sm text-muted-foreground">
-            Leveraged products ordered from 2x to 6x within each side
+            Products ordered by liquidity (high to very low), then leverage within each side
           </p>
         </div>
 
