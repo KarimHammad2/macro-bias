@@ -22,7 +22,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 export default function ProductsPage() {
   const email = useAdminSession();
@@ -53,7 +59,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,280px)_minmax(0,1.7fr)]">
         <div className={panelClass}>
           <div className="flex items-center justify-between">
             <div>
@@ -329,50 +335,65 @@ export default function ProductsPage() {
                               </button>
                             </div>
                           ) : (
-                            <div className="flex flex-wrap items-center justify-end gap-1 sm:gap-2">
-                              <button
-                                type="button"
-                                onClick={() => handleEditProduct(product)}
-                                className="inline-flex items-center justify-center rounded-lg border border-slate-700/60 p-1.5 text-slate-200 hover:border-slate-600/80"
-                                aria-label="Edit product"
-                              >
-                                <Pencil className="h-3.5 w-3.5" />
-                                <span className="sr-only">Edit</span>
-                              </button>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
+                            <div className="flex items-center justify-end">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
                                   <button
                                     type="button"
-                                    className="inline-flex items-center justify-center rounded-lg border border-red-500/40 p-1.5 text-red-300 hover:border-red-400"
-                                    aria-label="Delete product"
+                                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-700/60 text-slate-200 hover:border-slate-600/80"
+                                    aria-label="Open product actions"
                                   >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                    <span className="sr-only">Delete</span>
+                                    <MoreHorizontal className="h-4 w-4" />
                                   </button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent className="border-slate-800/60 bg-[#0a1628] text-slate-100">
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                      Delete this product?
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription className="text-slate-400">
-                                      This action cannot be undone. The product will be
-                                      removed from the dashboard immediately.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel className="border-slate-700/60 bg-transparent text-slate-200 hover:bg-slate-800/40">
-                                      Cancel
-                                    </AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => handleDeleteProduct(product.id)}
-                                      className="bg-red-500 text-white hover:bg-red-400"
-                                    >
-                                      Delete
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                  align="end"
+                                  className="min-w-36 bg-[#030712] text-slate-100"
+                                >
+                                  <DropdownMenuItem
+                                    onSelect={() => handleEditProduct(product)}
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" />
+                                    <span>Edit</span>
+                                  </DropdownMenuItem>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <DropdownMenuItem
+                                        onSelect={(event) => event.preventDefault()}
+                                        variant="destructive"
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                        <span>Delete</span>
+                                      </DropdownMenuItem>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent className="border-slate-800/60 bg-[#0a1628] text-slate-100">
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                          Delete this product?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription className="text-slate-400">
+                                          This action cannot be undone. The product
+                                          will be removed from the dashboard
+                                          immediately.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel className="border-slate-700/60 bg-transparent text-slate-200 hover:bg-slate-800/40">
+                                          Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() =>
+                                            handleDeleteProduct(product.id)
+                                          }
+                                          className="bg-red-500 text-white hover:bg-red-400"
+                                        >
+                                          Delete
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           )}
                         </td>
