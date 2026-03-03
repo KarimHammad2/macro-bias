@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const navItems = [
+export const adminNavItems = [
   { name: "Overview", href: "/admin" },
   { name: "Homepage Metrics", href: "/admin/homepage-metrics" },
   { name: "Dashboard Metrics", href: "/admin/dashboard-metrics" },
   { name: "Performance", href: "/admin/performance" },
   { name: "Positions", href: "/admin/positions" },
   { name: "Products", href: "/admin/products" },
+  { name: "Framework Page", href: "/admin/framework" },
   {
     name: "Nagivation Guide",
     href: "/admin/navigation-guides",
@@ -37,7 +38,7 @@ export function AdminSidebar() {
           Manage
         </p>
         <ul className="space-y-1">
-          {navItems.map((item) => {
+          {adminNavItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <li key={item.href}>

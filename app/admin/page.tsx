@@ -16,6 +16,11 @@ const cards = [
     href: "/admin/dashboard-metrics",
   },
   {
+    title: "Framework Page",
+    description: "Edit Framework & Methodology sections and copy.",
+    href: "/admin/framework",
+  },
+  {
     title: "Performance",
     description: "Manage yearly performance rows shown in the app.",
     href: "/admin/performance",

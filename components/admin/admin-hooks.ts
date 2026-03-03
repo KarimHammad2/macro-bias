@@ -110,6 +110,23 @@ export type PerformanceYearlyForm = {
   alpha: string;
 };
 
+export type FrameworkSection = {
+  id: string;
+  slug: string;
+  title: string;
+  body: string;
+  sortOrder: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type FrameworkSectionForm = {
+  slug: string;
+  title: string;
+  body: string;
+  sortOrder: string;
+};
+
 export type AdminRecord = {
   id: string;
   email: string;
@@ -164,6 +181,13 @@ const emptyPerformanceYearly: PerformanceYearlyForm = {
   macroBias: "",
   sp500: "",
   alpha: "",
+};
+
+const emptyFrameworkSection: FrameworkSectionForm = {
+  slug: "",
+  title: "",
+  body: "",
+  sortOrder: "",
 };
 
 const emptyNavigationGuide: NavigationGuideForm = {
@@ -1243,6 +1267,216 @@ export function usePerformanceYearly(email: string | null) {
     handleEditPerformance,
     handleSavePerformance,
     handleDeletePerformance,
+  };
+}
+
+export function useFrameworkSections(email: string | null) {
+  const [sections, setSections] = useState<FrameworkSection[]>([]);
+  const [sectionsError, setSectionsError] = useState<string | null>(null);
+  const [isSavingSection, setIsSavingSection] = useState(false);
+  const [sectionDraft, setSectionDraft] =
+    useState<FrameworkSectionForm>(emptyFrameworkSection);
+  const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
+  const [editingSection, setEditingSection] =
+    useState<FrameworkSectionForm | null>(null);
+
+  useEffect(() => {
+    const loadSections = async () => {
+      const response = await fetch("/api/admin/framework-sections");
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        setSectionsError(payload?.message || "Unable to load framework sections.");
+        return;
+      }
+      const payload = await response.json().catch(() => null);
+      setSections(payload?.sections ?? []);
+      setSectionsError(null);
+    };
+
+    loadSections();
+  }, []);
+
+  const handleSectionDraftChange = <K extends keyof FrameworkSectionForm>(
+    field: K,
+    value: FrameworkSectionForm[K]
+  ) => {
+    setSectionDraft((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAddSection = async () => {
+    if (!email) {
+      const message = "Missing admin email. Please sign in again.";
+      setSectionsError(message);
+      toast.error(message);
+      return;
+    }
+
+    setIsSavingSection(true);
+    setSectionsError(null);
+
+    try {
+      const response = await fetch("/api/admin/framework-sections", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          slug: sectionDraft.slug,
+          title: sectionDraft.title,
+          body: sectionDraft.body,
+          sortOrder: parseNumberInput(sectionDraft.sortOrder, "sort order"),
+        }),
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        const message = payload?.message || "Unable to add framework section.";
+        setSectionsError(message);
+        toast.error(message);
+        setIsSavingSection(false);
+        return;
+      }
+
+      const payload = await response.json().catch(() => null);
+      if (payload?.section) {
+        setSections((prev) => [...prev, payload.section]);
+        setSectionDraft(emptyFrameworkSection);
+        toast.success("Framework section added.");
+      }
+    } catch (saveError) {
+      const message =
+        saveError instanceof Error ? saveError.message : "Unable to add framework section.";
+      setSectionsError(message);
+      toast.error(message);
+    } finally {
+      setIsSavingSection(false);
+    }
+  };
+
+  const handleEditSection = (section: FrameworkSection) => {
+    setEditingSectionId(section.id);
+    setEditingSection({
+      slug: section.slug,
+      title: section.title,
+      body: section.body,
+      sortOrder: String(section.sortOrder),
+    });
+  };
+
+  const handleSaveSection = async (id: string) => {
+    if (!email) {
+      const message = "Missing admin email. Please sign in again.";
+      setSectionsError(message);
+      toast.error(message);
+      return;
+    }
+    if (!editingSection) return;
+
+    setIsSavingSection(true);
+    setSectionsError(null);
+
+    try {
+      const response = await fetch("/api/admin/framework-sections", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          id,
+          slug: editingSection.slug,
+          title: editingSection.title,
+          body: editingSection.body,
+          sortOrder: parseNumberInput(editingSection.sortOrder, "sort order"),
+        }),
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        const message = payload?.message || "Unable to save framework section.";
+        setSectionsError(message);
+        toast.error(message);
+        setIsSavingSection(false);
+        return;
+      }
+
+      const payload = await response.json().catch(() => null);
+      if (payload?.section) {
+        setSections((prev) =>
+          prev.map((item) => (item.id === id ? payload.section : item))
+        );
+        setEditingSectionId(null);
+        setEditingSection(null);
+        toast.success("Framework section updated.");
+      }
+    } catch (saveError) {
+      const message =
+        saveError instanceof Error
+          ? saveError.message
+          : "Unable to save framework section.";
+      setSectionsError(message);
+      toast.error(message);
+    } finally {
+      setIsSavingSection(false);
+    }
+  };
+
+  const handleDeleteSection = async (id: string) => {
+    if (!email) {
+      const message = "Missing admin email. Please sign in again.";
+      setSectionsError(message);
+      toast.error(message);
+      return;
+    }
+
+    setIsSavingSection(true);
+    setSectionsError(null);
+
+    try {
+      const response = await fetch("/api/admin/framework-sections", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, id }),
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        const message = payload?.message || "Unable to delete framework section.";
+        setSectionsError(message);
+        toast.error(message);
+        setIsSavingSection(false);
+        return;
+      }
+
+      setSections((prev) => prev.filter((item) => item.id !== id));
+      if (editingSectionId === id) {
+        setEditingSectionId(null);
+        setEditingSection(null);
+      }
+      toast.success("Framework section deleted.");
+    } catch (saveError) {
+      const message =
+        saveError instanceof Error
+          ? saveError.message
+          : "Unable to delete framework section.";
+      setSectionsError(message);
+      toast.error(message);
+    } finally {
+      setIsSavingSection(false);
+    }
+  };
+
+  return {
+    sections,
+    sectionsError,
+    isSavingSection,
+    sectionDraft,
+    editingSectionId,
+    editingSection,
+    setEditingSection,
+    setEditingSectionId,
+    handleSectionDraftChange,
+    handleAddSection,
+    handleEditSection,
+    handleSaveSection,
+    handleDeleteSection,
   };
 }
 

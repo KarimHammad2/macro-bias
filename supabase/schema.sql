@@ -113,6 +113,16 @@ create table if not exists public.performance_yearly (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.framework_sections (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  title text not null,
+  body text not null,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 alter table public.access_requests enable row level security;
 alter table public.admins enable row level security;
 alter table public.homepage_metrics enable row level security;
@@ -121,6 +131,7 @@ alter table public.navigation_guides enable row level security;
 alter table public.positions enable row level security;
 alter table public.products enable row level security;
 alter table public.performance_yearly enable row level security;
+alter table public.framework_sections enable row level security;
 
 drop policy if exists "allow_insert_access_requests" on public.access_requests;
 drop policy if exists "allow_select_own_access_request" on public.access_requests;
@@ -148,6 +159,10 @@ drop policy if exists "allow_admin_select_performance_yearly" on public.performa
 drop policy if exists "allow_admin_insert_performance_yearly" on public.performance_yearly;
 drop policy if exists "allow_admin_update_performance_yearly" on public.performance_yearly;
 drop policy if exists "allow_admin_delete_performance_yearly" on public.performance_yearly;
+drop policy if exists "allow_admin_select_framework_sections" on public.framework_sections;
+drop policy if exists "allow_admin_insert_framework_sections" on public.framework_sections;
+drop policy if exists "allow_admin_update_framework_sections" on public.framework_sections;
+drop policy if exists "allow_admin_delete_framework_sections" on public.framework_sections;
 
 create policy "allow_insert_access_requests" on public.access_requests
   for insert
@@ -420,6 +435,50 @@ create policy "allow_admin_delete_performance_yearly" on public.performance_year
     )
   );
 
+create policy "allow_admin_select_framework_sections" on public.framework_sections
+  for select
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
+create policy "allow_admin_insert_framework_sections" on public.framework_sections
+  for insert
+  to authenticated
+  with check (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
+create policy "allow_admin_update_framework_sections" on public.framework_sections
+  for update
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
+create policy "allow_admin_delete_framework_sections" on public.framework_sections
+  for delete
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.admins
+      where admins.email = (auth.jwt() ->> 'email')
+    )
+  );
+
 insert into public.admins (email)
 values ('karim.88279@gmail.com')
 on conflict (email) do nothing;
@@ -578,3 +637,42 @@ values
   (2024, 7.89, 23.31, -15.42),
   (2025, 30.98, 15.13, 15.85)
 on conflict (year) do nothing;
+
+insert into public.framework_sections (
+  slug,
+  title,
+  body,
+  sort_order
+)
+values
+  (
+    'what-is',
+    'What is Macro Bias',
+    'Macro Bias is a systematic macro regime overlay designed to provide actionable signals for portfolio exposure management. The framework synthesizes multiple data streams including macroeconomic indicators, liquidity conditions, and volatility regimes to classify market environments.\n\nThe core output is a regime classification (Risk-On, Neutral, or Risk-Off) accompanied by a continuous score ranging from -1 to +1. This allows for both discrete regime-based decisions and more granular position sizing.\n\nThe methodology is designed for investors who seek to reduce drawdowns while participating in market upside, particularly those comfortable with leveraged exposure during favorable conditions.',
+    1
+  ),
+  (
+    'what-not',
+    'What Macro Bias is Not',
+    '- Not a trading system or specific trade recommendation service\n- Not investment advice or financial guidance\n- Not a guaranteed system for avoiding all market losses\n- Not suitable for all investors or risk profiles\n- Not a substitute for professional financial advice',
+    2
+  ),
+  (
+    'core-inputs',
+    'Core Inputs',
+    '### Macro Environment\nEconomic growth indicators, inflation dynamics, central bank policy signals, and cross-asset correlations inform the broader economic context.\n\n### Liquidity Conditions\nCentral bank balance sheets, credit spreads, funding market stress indicators, and cross-border capital flows drive liquidity assessment.\n\n### Volatility Regime\nImplied vs realized volatility, term structure dynamics, correlation regimes, and tail risk indicators determine market stress levels.',
+    3
+  ),
+  (
+    'why-no-futures',
+    'Why We Avoid Futures',
+    'A key design decision is the preference for leveraged ETFs/ETPs over futures contracts. This stems from a fundamental difference in cost structure that has significant implications for long-term compounding.\n\n**Futures/Perpetuals Cost Structure**\nTime-based financing costs accumulate continuously. The longer you hold, the more you pay, regardless of how often you adjust positions. This is particularly punitive for regime-following strategies that may hold positions for extended periods.\n\n**Leveraged ETF/ETP Cost Structure**\nDecision-based costs that primarily manifest during rebalancing. If you hold through a regime without changes, your cost is minimal. This aligns better with our methodology.\n\n| Instrument Type        | Illustrative Annual Cost | Cost Driver                     |\n| ---------------------- | ------------------------ | ------------------------------- |\n| Futures / Perpetuals   | 20-35% p.a.             | Time-based (exposure × time)    |\n| Leveraged ETFs/ETPs    | 2-4% p.a.               | Decision-based (rebalancing events) |\n\nNote: Costs are illustrative and vary by market conditions, specific instruments, and broker arrangements.',
+    4
+  ),
+  (
+    'update-frequency',
+    'Update Frequency',
+    '- **Daily Score**: Updated at market close each trading day based on intraday data.\n- **Weekly Review**: Full model recalibration and regime assessment every weekend.\n- **Regime Change Alerts**: Immediate notification when regime classification changes.\n- **Monthly Reports**: Comprehensive performance and attribution analysis.',
+    5
+  )
+on conflict (slug) do nothing;
