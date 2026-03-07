@@ -24,11 +24,16 @@ const philosophyItems = [
   },
 ];
 
-function usePhilosophyScrollProgress(sectionRef: React.RefObject<HTMLElement | null>) {
+function usePhilosophyScrollProgress(
+  sectionRef: React.RefObject<HTMLElement | null>,
+  options: { skip?: boolean } = {}
+) {
   const [progress, setProgress] = useState(0);
   const rafRef = useRef<number | null>(null);
+  const { skip = false } = options;
 
   useEffect(() => {
+    if (skip) return;
     const el = sectionRef.current;
     if (!el) return;
 
@@ -58,15 +63,15 @@ function usePhilosophyScrollProgress(sectionRef: React.RefObject<HTMLElement | n
       window.removeEventListener("resize", onScrollOrResize);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
-  }, [sectionRef]);
+  }, [sectionRef, skip]);
 
-  return progress;
+  return skip ? 1 : progress;
 }
 
 export function PhilosophySection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const progress = usePhilosophyScrollProgress(sectionRef);
   const [isMobile, setIsMobile] = useState(false);
+  const progress = usePhilosophyScrollProgress(sectionRef, { skip: isMobile });
 
   useEffect(() => {
     const query = window.matchMedia("(max-width: 767px)");
@@ -83,37 +88,42 @@ export function PhilosophySection() {
 
   const mergeStart = isMobile ? mobileMergeStart : desktopMergeStart;
   const mergeEnd = isMobile ? mobileMergeEnd : desktopMergeEnd;
-  const mergeFactor =
-    progress < mergeStart
+  const mergeFactor = isMobile
+    ? 1
+    : progress < mergeStart
       ? 0
       : progress > mergeEnd
         ? 1
         : (progress - mergeStart) / (mergeEnd - mergeStart);
-  const threeOpacity =
-    progress < (isMobile ? 0.56 : 0.5)
+  const threeOpacity = isMobile
+    ? 0
+    : progress < (isMobile ? 0.56 : 0.5)
       ? 1
       : progress > (isMobile ? 0.76 : 0.65)
         ? 0
         : 1 - (progress - (isMobile ? 0.56 : 0.5)) / (isMobile ? 0.2 : 0.15);
-  const combinedOpacity =
-    progress < (isMobile ? 0.54 : 0.45)
+  const combinedOpacity = isMobile
+    ? 1
+    : progress < (isMobile ? 0.54 : 0.45)
       ? 0
       : progress > (isMobile ? 0.78 : 0.65)
         ? 1
         : (progress - (isMobile ? 0.54 : 0.45)) / (isMobile ? 0.24 : 0.2);
-  const textOpacity =
-    progress < (isMobile ? 0.48 : 0.4)
+  const textOpacity = isMobile
+    ? 1
+    : progress < (isMobile ? 0.48 : 0.4)
       ? 1
       : progress > (isMobile ? 0.68 : 0.6)
         ? 0
         : 1 - (progress - (isMobile ? 0.48 : 0.4)) / (isMobile ? 0.2 : 0.2);
 
   const getColumnStyle = (index: number) => {
-    const transition = isMobile
-      ? "transform 0.3s ease-out, opacity 0.3s ease-out"
-      : "transform 0.15s ease-out, opacity 0.2s ease-out";
+    if (isMobile) {
+      return { transform: "translateX(0)" as const, opacity: 1 };
+    }
+    const transition = "transform 0.15s ease-out, opacity 0.2s ease-out";
     let translateX = "0";
-    const mergeDistance = isMobile ? 20 : 33;
+    const mergeDistance = 33;
     if (index === 0) translateX = `${mergeFactor * mergeDistance}%`;
     if (index === 2) translateX = `${-mergeFactor * mergeDistance}%`;
     return {
@@ -141,7 +151,10 @@ export function PhilosophySection() {
                 className="flex flex-col items-center text-left"
                 style={getColumnStyle(index)}
               >
-                <div className="relative mb-6 h-32 w-full max-w-[200px] shrink-0">
+                <div
+                  className="relative mb-6 h-32 w-full max-w-[200px] shrink-0"
+                  style={isMobile ? undefined : { opacity: threeOpacity, transition: "opacity 0.2s ease-out" }}
+                >
                   <Image
                     src={item.src}
                     alt=""
@@ -167,25 +180,27 @@ export function PhilosophySection() {
             ))}
           </div>
 
-          <div
-            className="absolute left-1/2 top-0 flex w-full -translate-x-1/2 justify-center md:top-0"
-            style={{
-              opacity: combinedOpacity,
-              transition: "opacity 0.2s ease-out",
-              pointerEvents: combinedOpacity > 0.5 ? "auto" : "none",
-            }}
-          >
-            <div className="relative h-40 w-48 shrink-0 md:h-48 md:w-60">
-              <Image
-                src="/logo.png"
-                alt=""
-                width={240}
-                height={192}
-                className="object-contain"
-                aria-hidden="true"
-              />
+          {!isMobile && (
+            <div
+              className="absolute left-1/2 top-0 flex w-full -translate-x-1/2 justify-center md:top-0"
+              style={{
+                opacity: combinedOpacity,
+                transition: "opacity 0.2s ease-out",
+                pointerEvents: combinedOpacity > 0.5 ? "auto" : "none",
+              }}
+            >
+              <div className="relative h-40 w-48 shrink-0 md:h-48 md:w-60">
+                <Image
+                  src="/logo.png"
+                  alt=""
+                  width={240}
+                  height={192}
+                  className="object-contain"
+                  aria-hidden="true"
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </section>
