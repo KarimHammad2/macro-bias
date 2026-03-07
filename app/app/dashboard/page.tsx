@@ -67,7 +67,7 @@ function PositionsTable({
 }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full">
+      <table className="w-full min-w-[640px]">
         <thead>
           <tr className="border-b border-border">
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -133,7 +133,7 @@ function PositionsTable({
 function ProductsTable({ products, type }: { products: Product[]; type: string }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full">
+      <table className="w-full min-w-[640px]">
         <thead>
           <tr className="border-b border-border">
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -398,9 +398,10 @@ export default function DashboardPage() {
 
         <div className="flex border-b border-border">
           <button
+            type="button"
             onClick={() => setActiveProductTab("Long")}
             className={cn(
-              "px-6 py-3 text-sm font-medium transition-colors",
+              "min-h-11 flex-1 px-4 py-3 text-sm font-medium transition-colors touch-manipulation sm:flex-none sm:px-6",
               activeProductTab === "Long"
                 ? "border-b-2 border-positive text-positive"
                 : "text-muted-foreground hover:text-foreground"
@@ -409,9 +410,10 @@ export default function DashboardPage() {
             Long Products
           </button>
           <button
+            type="button"
             onClick={() => setActiveProductTab("Short")}
             className={cn(
-              "px-6 py-3 text-sm font-medium transition-colors",
+              "min-h-11 flex-1 px-4 py-3 text-sm font-medium transition-colors touch-manipulation sm:flex-none sm:px-6",
               activeProductTab === "Short"
                 ? "border-b-2 border-negative text-negative"
                 : "text-muted-foreground hover:text-foreground"

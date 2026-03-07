@@ -34,7 +34,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 <SheetTrigger asChild>
                   <button
                     type="button"
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-800/70 bg-[#030712] text-slate-200 shadow-sm lg:hidden"
+                    className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-slate-800/70 bg-[#030712] text-slate-200 shadow-sm lg:hidden touch-manipulation"
                     aria-label="Open admin navigation"
                   >
                     <svg
@@ -54,7 +54,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 </SheetTrigger>
                 <SheetContent
                   side="left"
-                  className="w-64 border-slate-800/60 bg-[#0a1322] p-0 text-slate-100"
+                  className="w-[80vw] max-w-xs border-slate-800/60 bg-[#0a1322] p-0 text-slate-100"
                 >
                   <div className="border-b border-slate-800/60 px-4 py-4">
                     <p className="text-[10px] uppercase tracking-[0.35em] text-slate-500">
@@ -73,7 +73,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                             <button
                               type="button"
                               onClick={() => handleNav(item.href)}
-                              className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-left transition-colors ${
+                              className={`flex w-full min-h-11 items-center justify-between rounded-lg px-3 py-2 text-sm text-left transition-colors touch-manipulation ${
                                 isActive
                                   ? "bg-slate-800/70 text-white"
                                   : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200"

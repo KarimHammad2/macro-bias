@@ -110,7 +110,15 @@ function AccessModal() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      style={{
+        paddingTop: "max(1rem, env(safe-area-inset-top))",
+        paddingRight: "max(1rem, env(safe-area-inset-right))",
+        paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+        paddingLeft: "max(1rem, env(safe-area-inset-left))",
+      }}
+    >
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-[#030712]/95 backdrop-blur-sm animate-fade-in"
@@ -118,7 +126,7 @@ function AccessModal() {
       />
 
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-[400px] animate-fade-in-up">
+      <div className="relative z-10 w-full max-w-[400px] animate-fade-in-up max-h-dvh overflow-y-auto">
         {/* Subtle glow behind modal */}
         <div className="absolute -inset-4 bg-[#3b82f6]/5 blur-3xl rounded-full" />
         
@@ -126,10 +134,12 @@ function AccessModal() {
           {/* Top accent line */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent" />
           
-          {/* Close button */}
+          {/* Close button - min 44px touch target */}
           <button
+            type="button"
             onClick={closeModal}
-            className="absolute top-4 right-4 p-1.5 text-slate-500 hover:text-white transition-colors"
+            aria-label="Close"
+            className="absolute top-4 right-4 flex min-h-11 min-w-11 items-center justify-center p-2 text-slate-500 hover:text-white transition-colors touch-manipulation"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -178,7 +188,7 @@ function AccessModal() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full px-4 py-3 bg-[#030712] border border-slate-700/70 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-[#3b82f6]/70 focus:ring-1 focus:ring-[#3b82f6]/30 transition-all"
+                  className="w-full px-4 py-3 bg-[#030712] border border-slate-700/70 text-white text-base placeholder:text-slate-600 focus:outline-none focus:border-[#3b82f6]/70 focus:ring-1 focus:ring-[#3b82f6]/30 transition-all min-h-11"
                   autoFocus
                 />
                 {error && (
@@ -190,7 +200,7 @@ function AccessModal() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 bg-[#3b82f6] hover:bg-[#2563eb] text-white text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full min-h-11 py-3 bg-[#3b82f6] hover:bg-[#2563eb] text-white text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
               >
                 {isLoading ? (
                   <>

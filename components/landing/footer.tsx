@@ -43,6 +43,9 @@ export function Footer() {
     <footer
       id="contact"
       className="relative w-full overflow-x-clip bg-[#0a1628] pt-10 pb-20 sm:pt-16 sm:pb-24 md:py-32 touch-pan-y"
+      style={{
+        paddingBottom: "max(5rem, calc(5rem + env(safe-area-inset-bottom)))",
+      }}
     >
       {/* Dot pattern background */}
       <div className="absolute inset-0 opacity-30">
@@ -96,8 +99,9 @@ export function Footer() {
           {/* Get Access / Login Button */}
           <div className="w-full max-w-md">
             <button
+              type="button"
               onClick={handleCtaClick}
-            className="group flex mx-auto items-center justify-center gap-3 border-b-2 border-[#3b82f6] px-6 py-4 text-sm font-medium uppercase tracking-[0.18em] sm:tracking-widest text-[#60a5fa] transition-all hover:bg-[#3b82f6] hover:text-white cursor-pointer"
+              className="group flex mx-auto min-h-11 items-center justify-center gap-3 border-b-2 border-[#3b82f6] px-6 py-4 text-sm font-medium uppercase tracking-[0.18em] sm:tracking-widest text-[#60a5fa] transition-all hover:bg-[#3b82f6] hover:text-white cursor-pointer touch-manipulation"
             >
               {ctaLabel}
               <svg

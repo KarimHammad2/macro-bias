@@ -30,19 +30,24 @@ export function ScrollToTop() {
 
   return (
     <button
+      type="button"
       onClick={scrollToTop}
       aria-label="Scroll to top"
       className={cn(
-        "fixed bottom-6 right-6 z-50 p-3 rounded-full",
+        "fixed z-50 flex min-h-11 min-w-11 items-center justify-center rounded-full p-3",
         "bg-primary/90 hover:bg-primary text-primary-foreground",
         "shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30",
         "backdrop-blur-sm border border-primary/20",
-        "transition-all duration-300 ease-out",
+        "transition-all duration-300 ease-out touch-manipulation",
         "hover:scale-110 active:scale-95",
         isVisible
           ? "opacity-100 translate-y-0"
           : "opacity-0 translate-y-4 pointer-events-none"
       )}
+      style={{
+        bottom: "max(1.5rem, env(safe-area-inset-bottom))",
+        right: "max(1.5rem, env(safe-area-inset-right))",
+      }}
     >
       <ArrowUp className="size-5" />
     </button>

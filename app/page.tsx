@@ -10,7 +10,7 @@ import { ScrollToTop } from "@/components/landing/scroll-to-top";
 export default function LandingPage() {
   return (
     <ModalProvider>
-      <main className="min-h-screen bg-[#030712]">
+      <main className="min-h-dvh overflow-x-hidden bg-[#030712]">
         <LandingNavbar />
         <HeroSection />
         <MethodologySection />

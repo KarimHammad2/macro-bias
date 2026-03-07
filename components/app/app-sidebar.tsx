@@ -169,11 +169,11 @@ export function AppSidebar({
               const isActive = pathname === item.href;
               return (
                 <li key={item.href}>
-                  <Link
+                    <Link
                     href={item.href}
                     onClick={onNavigate}
                     className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors",
+                      "flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors touch-manipulation",
                       isActive
                         ? "bg-sidebar-accent text-sidebar-accent-foreground"
                         : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"

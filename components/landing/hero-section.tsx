@@ -73,7 +73,7 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#030712]">
+    <section className="relative min-h-dvh overflow-hidden bg-[#030712]">
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-linear-to-b from-[#030712] via-[#030712] to-[#0a1628]" />
       
@@ -82,8 +82,15 @@ export function HeroSection() {
         <DotPattern />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-4 pb-12 pt-32 sm:px-6 sm:pb-20 sm:pt-40 lg:px-8 lg:pb-24 lg:pt-56">
+      {/* Content - safe area for notched devices */}
+      <div
+        className="relative z-10 mx-auto flex min-h-dvh max-w-7xl flex-col justify-center px-4 pb-12 pt-32 sm:px-6 sm:pb-20 sm:pt-40 lg:px-8 lg:pb-24 lg:pt-56"
+        style={{
+          paddingTop: "max(8rem, calc(8rem + env(safe-area-inset-top)))",
+          paddingLeft: "max(1rem, env(safe-area-inset-left))",
+          paddingRight: "max(1rem, env(safe-area-inset-right))",
+        }}
+      >
         <div
           className={`max-w-3xl transition-all duration-1000 ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"

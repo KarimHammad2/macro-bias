@@ -54,8 +54,9 @@ export function LandingNavbar() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-[#030712]/90 backdrop-blur-md border-b border-slate-800" : "bg-transparent"
       }`}
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-8">
+      <nav className="mx-auto flex h-14 min-h-14 max-w-7xl items-center justify-between px-4 sm:h-20 sm:min-h-20 sm:px-6 lg:px-8">
         <Link
           href="/"
           className="flex items-center gap-2 transition-opacity hover:opacity-90"
@@ -78,8 +79,9 @@ export function LandingNavbar() {
         <div className="flex items-center gap-4">
           {/* Mobile CTA - always visible on small screens */}
           <button
+            type="button"
             onClick={handleCtaClick}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#1f2937] bg-[#020617]/80 px-3 py-1.5 text-xs font-medium text-[#e5e7eb] shadow-sm backdrop-blur-sm transition-colors hover:border-[#3b82f6] hover:text-white md:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border border-[#1f2937] bg-[#020617]/80 px-4 py-2.5 text-xs font-medium text-[#e5e7eb] shadow-sm backdrop-blur-sm transition-colors hover:border-[#3b82f6] hover:text-white md:hidden touch-manipulation"
           >
             {ctaLabel}
             <svg

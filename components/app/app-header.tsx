@@ -63,7 +63,7 @@ export function AppHeader() {
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-foreground shadow-sm lg:hidden"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-border bg-background text-foreground shadow-sm lg:hidden touch-manipulation"
                 aria-label="Open navigation"
               >
                 <svg
